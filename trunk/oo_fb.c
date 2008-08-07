@@ -1,3 +1,7 @@
+/*
+ * Just wanto check if svn works fine - by Dee
+ *
+ */
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
