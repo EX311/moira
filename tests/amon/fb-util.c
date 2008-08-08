@@ -99,33 +99,19 @@ void drow_line(int x1, int y1, int x2, int y2, struct color color)
 	}
 }
 
-		/*
-		   int dx, dy;
-		   int d ;
 
-		   dx = x2 -x1 ;
-		   dy = y2 -y1 ;
-
-
-
-		   if ( dx == 0 || dy == 0) //가로 세로 직선
-		   {
-
-		   }
-		   else // 대각선
-		   {
-		   d = (dx/dy);
-
-
-		   }
-
-*/
+void drow_rect (int x1, int y1, int x2, int y2, struct color color)
+{
+	drow_line (x1, y1, x2, y1, color);
+	drow_line (x2, y1, x2, y2, color);
+	drow_line (x2, y2, x1, y2, color);
+	drow_line (x1, y2, x1, y1, color);
+}
 
 
 	
-
-	struct myfb_info* myfb_open (void)
-	{
+struct myfb_info* myfb_open (void)
+{
 
 		int ret ;
 		int fbfd ;

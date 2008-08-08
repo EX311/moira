@@ -26,4 +26,7 @@ struct myfb_info
 extern void drow_pixel(int x, int y, struct color);
 
 extern void drow_line(int x1, int y1, int x2, int y2, struct color color);
+
+extern void drow_rect (int x1, int y1, int x2, int y2, struct color color);
+
 extern struct myfb_info* myfb_open (void);

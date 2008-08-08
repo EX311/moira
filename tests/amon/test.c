@@ -17,13 +17,14 @@ int main(void)
 	color.r = 0 ;
 	color.g = 0;
 	color.b = 255;
-
+/*
 	for ( i = 0 ; i <100 ;i++)
 	{
 		for( j=0; j <100 ; j++)
 			drow_pixel(j,i,color);
 	}
-
+*/
+	drow_rect(10,10,150,60,color);
 	drow_line(150,150, 300,200,color);
 	
 	printf("x-resolution : %d\n", myfb->fbvar.xres);
