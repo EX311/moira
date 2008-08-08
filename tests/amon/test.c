@@ -18,11 +18,13 @@ int main(void)
 	color.g = 0;
 	color.b = 255;
 
-	for ( i = 0 ; i <220 ;i++)
+	for ( i = 0 ; i <100 ;i++)
 	{
 		for( j=0; j <100 ; j++)
 			drow_pixel(j,i,color);
 	}
+
+	drow_line(150,150, 300,200,color);
 	
 	printf("x-resolution : %d\n", myfb->fbvar.xres);
 	printf("y-resolution : %d\n", myfb->fbvar.yres);
