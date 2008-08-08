@@ -24,6 +24,13 @@ int error_handling(char *message)
 }
 
 /*
+ * from string of ip to integer port NO.
+ */
+int ip2port(char *ip)
+{
+	return ( (inet_addr(ip)) >> 24) + 8000;
+}
+/*
  * TCP server functions
  *
 

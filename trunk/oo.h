@@ -21,6 +21,7 @@ struct oo_fb_data {
 	int pix_data;
 };
 
+extern int ip2port(char *);
 extern int tcp_server_listen(char *, int);
 extern int tcp_server_accept(int);
 extern int tcp_client_connect(char *, char *);
