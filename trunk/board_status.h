@@ -29,7 +29,7 @@ struct board_struct bs;
 /*
  *  control functions
  *
- *                                     */
+ */                                     
 extern void initall();
 
 extern unsigned char get_connection_status();

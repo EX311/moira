@@ -1,7 +1,23 @@
+#include <string.h>
 #include "board_status.h"
 
 extern void initall()
 {
+	int i;
+	bs.is_connect = 0;
+	bs.device_attached = 0;
+
+	/* 4 is initial value.. location number must be in range of 0-3 after mastering. */
+	bs.my_location = 4;
+	
+	/* same reason */
+	bs.master_location = 4; 
+
+	for(i=0;i<3;i++){
+		bs.ip_info[i] = NULL;
+		bs.mastered_ip_info[i] = NULL;
+	}
+	
 
 }
 
