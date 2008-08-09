@@ -1,5 +1,5 @@
 /*
- * fb info 
+ * fb utils 
  */
 
 
@@ -12,12 +12,15 @@
 #include <sys/ioctl.h> /* for ioctl */
 #include <linux/fb.h> /* for fb_var_screeninfo, FBIOGET_VSCREENINFO */
 #include <sys/mman.h> /* for mmap */
+#include <string.h> /*for memcpy */
 
 #include "fb-util.h"
 
 
 
 #define FBDEVFILE "/dev/fb0"
+
+
 
 #define DEBUG 0
 
@@ -32,6 +35,9 @@ printf(" message \n");
 struct myfb_info *myfb;
 struct color color;
 
+unsigned short* vfb_list[VFB_MAX] ; 
+
+
 unsigned short makepixel(struct color color)
 {
 	unsigned char r = color.r;
@@ -41,23 +47,19 @@ unsigned short makepixel(struct color color)
 	return (unsigned short)(((r>>3)<<11)|((g>>2)<<5)|(b>>3));
 }
 
+
+ 
 void drow_pixel(int x, int y, struct color color)
 {
 	unsigned short pixel;
 	int offset ;
-
+	
 	offset =y * myfb->fbvar.xres + x;
 
 	pixel = makepixel(color);
 
-
-#if DEBUG
-	printf(" pixel is 0x%x  \n", pixel);
-	printf(" myfb->fb  x is : %d y is %d offset : %d val is 0x%x \n",x,y, offset ,*myfb->fb);
-
-#endif
-
-	*(myfb->fb+offset) = pixel ;
+	if(offset > -1 && offset <= myfb->fbfix.smem_len )
+		*(myfb->fb+offset) = pixel ;
 
 }
 
@@ -78,7 +80,6 @@ void drow_line(int x1, int y1, int x2, int y2, struct color color)
 		dx = (dx << 16) / dy;
 		while (y1 <= y2) {
 			drow_pixel(x1>>16, y1, color);
-			//		pixel (x1 >> 16, y1, colidx);
 			x1 += dx;
 			y1++;
 		}
@@ -92,7 +93,6 @@ void drow_line(int x1, int y1, int x2, int y2, struct color color)
 		dy = dx ? (dy << 16) / dx : 0;
 		while (x1 <= x2) {
 			drow_pixel(x1,y1>>16,color);
-		//	pixel (x1, y1 >> 16, colidx);
 			y1 += dy;
 			x1++;
 		}
@@ -108,6 +108,73 @@ void drow_rect (int x1, int y1, int x2, int y2, struct color color)
 	drow_line (x1, y2, x1, y1, color);
 }
 
+
+void  set_vfb_buf(int n)
+{
+	
+	int i ;
+
+	for(i =0 ; i<n; i++)
+	{
+		vfb_list[i]= (unsigned short*)malloc(myfb->fbfix.smem_len);
+
+		if(vfb_list[i] == 0)
+		{
+			perror("fb_list malloc error \n");
+			exit(1);
+		}
+
+	}
+}
+
+/*
+ * buf_pixel func uses only master,
+ * master saves each vfb data and send data 
+ * each vfb data is vfb_list[location]
+ *
+ */
+void buf_pixel(unsigned short* buf ,int x, int y, struct color color)
+{
+	unsigned short pixel;
+	int offset ;
+	int location  ;
+
+	if ( -1  < x && x <320 && -1< y  && y<240)
+	{
+		location = 0;
+		
+	}
+	if ( 319 < x && x <640 && -1< y  && y<240)
+	{
+		location = 1;
+		x-=320; 
+	}
+	
+	if ( -1 < x && x <320 && 239< y  && y<480)
+	{
+		location = 2;
+		y-=240;
+	}
+	
+	if ( 319 < x && x <640 && 239< y  && y<480)
+	{
+		location = 3;
+		x-=320;
+		y-=240;
+		
+	}
+
+	offset =y * myfb->fbvar.xres + x;
+	pixel = makepixel(color);
+		
+	if(offset > -1 && offset <= myfb->fbfix.smem_len )
+		*(vfb_list[location]+offset) = pixel ;
+}
+
+void show_vfb(unsigned short* vfb)
+{
+	memcpy( (void*)myfb->fb,vfb, myfb->fbfix.smem_len);
+}
 
 	
 struct myfb_info* myfb_open (void)
@@ -138,7 +205,7 @@ struct myfb_info* myfb_open (void)
 
 
 		//ret = ioctl(fbfd, FBIOGET_FSCREENINFO, &fbfix);
-		ret=ioctl(fbfd, FBIOGET_VSCREENINFO, &myfb->fbfix);
+		ret=ioctl(fbfd, FBIOGET_FSCREENINFO, &myfb->fbfix);
 
 		if(ret < 0)
 		{
@@ -161,38 +228,3 @@ struct myfb_info* myfb_open (void)
 		return myfb;
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/*
-	   int main(void)
-	   {
-
-	   struct fb_var_screeninfo* fbvar;
-	   struct fb_fix_screeninfo* fbfix;
-
-	   get_fbinfo(fbvar,fbfix);
-
-	   printf("x-resolution : %d\n", fbvar->xres);
-	   printf("y-resolution : %d\n", fbvar->yres);
-	   printf("x-resolution(virtual) : %d\n", fbvar->xres_virtual);
-	   printf("y-resolution(virtual) : %d\n", fbvar->yres_virtual);
-	   printf("bpp : %d\n", fbvar->bits_per_pixel);
-
-	   exit(0);
-
-	   }
-	   */

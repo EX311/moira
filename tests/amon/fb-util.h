@@ -8,6 +8,7 @@
 //struct color color;
 
 
+#define VFB_MAX 4
 
 struct color
 {
@@ -23,10 +24,17 @@ struct myfb_info
 	struct fb_fix_screeninfo fbfix;
 };
 
+//char* vfb_list[VFB_MAX] ; 
+unsigned short* vfb_list[VFB_MAX] ; 
+
+
 extern void drow_pixel(int x, int y, struct color);
-
 extern void drow_line(int x1, int y1, int x2, int y2, struct color color);
-
 extern void drow_rect (int x1, int y1, int x2, int y2, struct color color);
+
+//extern char** set_vfb_buf(int n);
+extern void set_vfb_buf(int n);
+extern void show_vfb(unsigned short* vfb);
+extern void buf_pixel(unsigned short* buf ,int x, int y, struct color color);
 
 extern struct myfb_info* myfb_open (void);
