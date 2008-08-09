@@ -104,20 +104,6 @@ ssize_t oo_key_read(struct file *filp, char *buf, size_t count, loff_t *f_pos)
 	else
 		return -EAGAIN;
 
-/*	rGPBDAT |= ((1<<4)|(1<<3)|(1<<2)|(1<<1)|1);
-	if (!anti_chat) {
-		rGPBDAT = (8+4+2+1);
-		udelay(400);
-		rGPBDAT = (16+4+2+1);
-		udelay(400);
-		rGPBDAT = (16+8+2+1);
-		udelay(400);
-		rGPBDAT = (16+8+4+1);
-		udelay(400);
-		rGPBDAT = (16+8+4+2);
-		udelay(400);
-	}
-*/
 	udelay(400);
 	return keyid;
 }
