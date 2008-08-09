@@ -29,12 +29,12 @@ char AfterMasterIp_data[DATASIZE]={0,};
 char MyLocation_data[DATASIZE]={0,};
 char MasterLocation_data[DATASIZE]={0,};
 char DeviceAttached_data[DATASIZE]={0,};
-// page: ÀúÀåÇÒ ÆäÀÌÁö
-// off: Á¤º¸±â·Ï ½ÃÀÛÀ§Ä¡
-// count: ÀĞ¾î¿Ã ¹ÙÀÌÆ®¼ö
-// eof: ÆÄÀÏÀÇ ³¡ÀÏ°æ¿ì 1·Î ¼ÂÆÃµÈ´Ù.
-// start: Ä¿³Î ¾î´À°÷¿¡µµ »ç¿ëµÇÁö ¾ÊÀ¸¸ç, 
-// data_unused: ¿©·¯ÆÄÀÏµé¿¡ ´ëÇÑ ÇÏ³ªÀÇ Äİ¹éÇÔ¼ö¸¦ »ı¼ºÇÏ´Âµ¥ ¾²ÀÏ¼ö ÀÖ´Ù. 
+// page: ì €ì¥í•  í˜ì´ì§€
+// off: ì •ë³´ê¸°ë¡ ì‹œì‘ìœ„ì¹˜
+// count: ì½ì–´ì˜¬ ë°”ì´íŠ¸ìˆ˜
+// eof: íŒŒì¼ì˜ ëì¼ê²½ìš° 1ë¡œ ì…‹íŒ…ëœë‹¤.
+// start: ì»¤ë„ ì–´ëŠê³³ì—ë„ ì‚¬ìš©ë˜ì§€ ì•Šìœ¼ë©°, 
+// data_unused: ì—¬ëŸ¬íŒŒì¼ë“¤ì— ëŒ€í•œ í•˜ë‚˜ì˜ ì½œë°±í•¨ìˆ˜ë¥¼ ìƒì„±í•˜ëŠ”ë° ì“°ì¼ìˆ˜ ìˆë‹¤. 
 int get_IsConnect(char *page, char **start, off_t off, int count, int *eof, void *data_unused)
 {
 
