@@ -148,3 +148,15 @@ struct oo_fb_data *fb_recv(int sock, char *buff, int *size)
 	*size = ret;
 	return (struct oo_fb_data *)buff;
 }	
+
+int data4monitor(struct oo_fb_data *data, int offset, int data)
+{
+	if (data) {
+		oo_fb_data->offset = offset;
+		oo_fb_data->pix_data = data;
+		return 0;
+	}
+	return -1;
+}
+
+
