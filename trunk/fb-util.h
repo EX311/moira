@@ -36,11 +36,12 @@ extern void drow_rect (int x1, int y1, int x2, int y2, struct color color);
 
 //extern char** set_vfb_buf(int n);
 extern void set_vfb_buf(int n);
+extern void free_vfb_buf(int n);
 extern void show_vfb(unsigned short* vfb);
 extern void buf_pixel(unsigned short* buf ,int x, int y, struct color color);
 
 extern struct myfb_info* myfb_open (void);
-extern void myfb_close(struct myfb_info *);
+extern void myfb_close(void);
 // add functions for BMP
 struct bmphandle_s;
 

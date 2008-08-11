@@ -24,10 +24,7 @@ printf(" message \n");
 */
 
 struct myfb_info *myfb;
-struct color color;
-
-unsigned short* vfb_list[VFB_MAX] ; 
-
+unsigned short *vfb_list[VFB_MAX];
 
 unsigned short makepixel(struct color color)
 {
@@ -38,8 +35,6 @@ unsigned short makepixel(struct color color)
 	return (unsigned short)(((r>>3)<<11)|((g>>2)<<5)|(b>>3));
 }
 
-
- 
 void drow_pixel(int x, int y, struct color color)
 {
 	unsigned short pixel;
@@ -100,7 +95,7 @@ void drow_rect (int x1, int y1, int x2, int y2, struct color color)
 }
 
 
-void  set_vfb_buf(int n)
+void set_vfb_buf(int n)
 {
 	
 	int i ;
@@ -114,7 +109,15 @@ void  set_vfb_buf(int n)
 			perror("fb_list malloc error \n");
 			exit(1);
 		}
+	}
+}
 
+void  free_vfb_buf(int n)
+{
+	int i;
+	for (i = 0; i < n; i++) {
+		if (vfb_list[i])
+			free(vfb_list[i]);
 	}
 }
 
@@ -166,10 +169,8 @@ void show_vfb(unsigned short* vfb)
 {
 	//memset( , 0, myfb->fbfix.smem_len);
 	memcpy( (void*)myfb->fb,vfb, myfb->fbfix.smem_len);
-	
 	memset( vfb, 0, myfb->fbfix.smem_len);
 }
-
 	
 struct myfb_info* myfb_open (void)
 {
@@ -177,6 +178,10 @@ struct myfb_info* myfb_open (void)
 		int ret ;
 
 		myfb =(struct myfb_info*) malloc(sizeof( struct myfb_info));
+		if (!myfb) {
+			perror("myfb malloc");
+			exit(1);
+		}
 
 		myfb->fd = open(FBDEVFILE, O_RDWR);
 
@@ -219,9 +224,9 @@ struct myfb_info* myfb_open (void)
 		}
 
 		return myfb;
-	}
+}
 
-void myfb_close(struct myfb_info *myfb)
+void myfb_close(void)
 {
 	munmap(myfb->fb, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
 	close(myfb->fd);

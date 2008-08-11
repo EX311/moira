@@ -30,6 +30,9 @@ typedef unsigned char ubyte;
 struct color white = {0xff, 0xff, 0xff};
 struct color black = {0,0,0};
 
+extern struct myfb_info *myfb;
+extern unsigned short *vfb_list[VFB_MAX];
+
 static void sig(int sig)
 {
 	fflush(stderr);
@@ -37,60 +40,50 @@ static void sig(int sig)
 	exit(2);
 }
 
-void put_char(int x, int y, int c, int colidx, unsigned short *pfbmap, struct fb_var_screeninfo *fbvar)
+void put_char(int x, int y, int c, int colidx)
 {
 	int i,j,bits;
 	for (i = 0; i < font_vga_8x8.height; i++) {
 		bits = font_vga_8x8.data [font_vga_8x8.height * c + i];
 		for (j = 0; j < font_vga_8x8.width; j++, bits <<= 1)
 			if (bits & 0x80)
-				*(pfbmap+(y+i)*fbvar->xres+(x+j)) = makepixel(white);
+				drow_pixel(x+j, y+i, white);
 	}
 }
 
-void put_string(int x, int y, char *s, unsigned colidx, unsigned short *pfbmap, struct fb_var_screeninfo *fbvar)
+void put_string(int x, int y, char *s, unsigned colidx)
 {
 	int i;
 	for (i = 0; *s; i++, x += font_vga_8x8.width, s++)
-		put_char (x, y, *s, colidx, pfbmap, fbvar);
+		put_char (x, y, *s, colidx);
 }
 
-void put_string_center(int x, int y, char *s, unsigned colidx, unsigned short *pfbmap, struct fb_var_screeninfo *fbvar)
+void put_string_center(int x, int y, char *s, unsigned colidx)
 {
 	size_t sl = strlen (s);
-	put_string (x - (sl / 2) * font_vga_8x8.width, y - font_vga_8x8.height / 2, s, colidx, pfbmap, fbvar);
+	put_string (x - (sl / 2) * font_vga_8x8.width, y - font_vga_8x8.height / 2, s, colidx);
 }
 
-void clear_screen(unsigned short *pfbmap, struct fb_var_screeninfo *fbvar)
+void clear_screen(void)
 {
-	int i, j;
-	for (i = 0; i < fbvar->yres; i++)
-		for (j = 0; j < fbvar->xres; j++)
-			*(pfbmap+i*fbvar->xres+j) = makepixel(black);
-	put_string (fbvar->xres/4, fbvar->yres/8, ">> theMeal Project Monitor program", 1, pfbmap, fbvar);
-	put_string (fbvar->xres/4, fbvar->yres/8+20, ">> Code by amoolove", 2, pfbmap, fbvar);
-	put_string (fbvar->xres/2+150 , fbvar->yres/2 + fbvar->yres/4, "theMeal Project 2008", 3, pfbmap, fbvar);
+	memset(myfb->fb, 0, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
+	put_string (myfb->fbvar.xres/4, myfb->fbvar.yres/4-25, ">> theMeal Project Monitor program", 1);
+	put_string (myfb->fbvar.xres/4, myfb->fbvar.yres/4-10, ">> Code by amoolove", 2);
+	put_string (myfb->fbvar.xres/2+150 , myfb->fbvar.yres/2 + myfb->fbvar.yres/4, "theMeal Project 2008", 3);
 }
 
-void show_grid(unsigned short *pfbmap, struct fb_var_screeninfo *fbvar)
+void show_grid(void)
 {
-	int i, j;
-
-	for (i = (fbvar->yres/2)-YRES; i<= (fbvar->yres/2)+YRES; i++)
-		for (j = (fbvar->xres/2)-XRES; j<= (fbvar->xres/2)+XRES; j+=XRES)
-			*(pfbmap+i*fbvar->xres+j) = makepixel(white);
-	for (i = (fbvar->yres/2)-YRES; i<= (fbvar->yres/2)+YRES; i+=YRES)
-		for (j = (fbvar->xres/2)-XRES; j<= (fbvar->xres/2)+XRES; j++)
-			*(pfbmap+i*fbvar->xres+j) = makepixel(white);
+	drow_line(myfb->fbvar.xres/2, myfb->fbvar.yres/2-YRES, myfb->fbvar.xres/2, myfb->fbvar.yres/2+YRES, white);
+	drow_line(myfb->fbvar.xres/2-XRES, myfb->fbvar.yres/2, myfb->fbvar.xres/2+XRES, myfb->fbvar.yres/2, white);
+	drow_rect(myfb->fbvar.xres/2-XRES, myfb->fbvar.yres/2-YRES, myfb->fbvar.xres/2+XRES, myfb->fbvar.yres/2+YRES, white);
 }
 
 int main(int argc, char *argv[])
 {
 	int i, ret;
-	int fb_fd, serv_sock, clnt_sock;
-	unsigned short *pfbmap;
+	int serv_sock, clnt_sock;
 	struct oo_fb_data *fb_data;
-	struct fb_var_screeninfo fbvar;
 	char buff[BUFSIZE];
 
 	signal(SIGSEGV, sig);
@@ -98,36 +91,15 @@ int main(int argc, char *argv[])
 	signal(SIGTERM, sig);
 
 	printf(" *** Monitor for theMeal ***\n\n");
-
-	fb_fd = open(FBDEVFILE, O_RDWR);
-	if (fb_fd < 0) {
-		perror("fb open");
-		exit(1);
-	}
-
-	ret = ioctl(fb_fd, FBIOGET_VSCREENINFO, &fbvar);
-	if (ret < 0) {
-		perror("fb ioctl");
-		exit(1);
-	}
-
-	if (fbvar.bits_per_pixel != 16) {
-		fprintf(stderr, "bpp is NOT 16\n");
-		exit(1);
-	}
-
-	pfbmap = (unsigned short *)mmap(0, fbvar.xres*fbvar.yres*16/8, PROT_READ|PROT_WRITE, MAP_SHARED, fb_fd, 0);
-	if ( (unsigned)pfbmap == (unsigned)-1) {
-		perror("fb mmap");
-		exit(1);
-	}
 	
+	myfb = myfb_open();
+
 	serv_sock = tcp_server_listen(PORT, 2);
 	if (serv_sock < 0)
 		exit(1);
 /* initialize */
-	clear_screen(pfbmap, &fbvar);
-	show_grid(pfbmap, &fbvar);
+	clear_screen();
+	show_grid();
 	
 /* main process */
 	while (1) {
@@ -140,16 +112,15 @@ int main(int argc, char *argv[])
 			printf("READ: #%d\n", ret);
 			for (i=0; i<ret/sizeof(struct oo_fb_data); i++) {
 				fb_data = (struct oo_fb_data *)(buff+i*sizeof(struct oo_fb_data));
-				*(pfbmap+fb_data->offset) = fb_data->pix_data;
+				*(myfb->fb+fb_data->offset) = fb_data->pix_data;
 			}
-			show_grid(pfbmap, &fbvar);
+			show_grid();
 		}
 		close(clnt_sock);
 	}
 	
 	close(serv_sock);
-	munmap(pfbmap, fbvar.xres*fbvar.yres*16/8);
-	close(fb_fd);
+	myfb_close();
 	
 	printf("\n *** All done completely. ***\n");
 	exit(0);
