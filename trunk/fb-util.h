@@ -20,6 +20,7 @@ struct color
 
 struct myfb_info
 {
+	int fd;
 	unsigned short *fb ;
 	struct fb_var_screeninfo fbvar;
 	struct fb_fix_screeninfo fbfix;
@@ -39,6 +40,7 @@ extern void show_vfb(unsigned short* vfb);
 extern void buf_pixel(unsigned short* buf ,int x, int y, struct color color);
 
 extern struct myfb_info* myfb_open (void);
+extern void myfb_close(struct myfb_info *);
 // add functions for BMP
 struct bmphandle_s;
 

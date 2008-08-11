@@ -2,9 +2,6 @@
  * fb utils 
  */
 
-
-
-
 #include <stdio.h>
 #include <stdlib.h> /* for exit */
 #include <unistd.h> /* for open/close .. */
@@ -178,13 +175,12 @@ struct myfb_info* myfb_open (void)
 {
 
 		int ret ;
-		int fbfd ;
 
 		myfb =(struct myfb_info*) malloc(sizeof( struct myfb_info));
 
-		fbfd = open(FBDEVFILE, O_RDWR);
+		myfb->fd = open(FBDEVFILE, O_RDWR);
 
-		if(fbfd < 0)
+		if(myfb->fd < 0)
 		{
 			perror("fbdev open");
 			exit(1);
@@ -192,7 +188,7 @@ struct myfb_info* myfb_open (void)
 
 
 		//ret=ioctl(fbfd, FBIOGET_VSCREENINFO, &fbvar);
-		ret=ioctl(fbfd, FBIOGET_VSCREENINFO, &myfb->fbvar);
+		ret=ioctl(myfb->fd, FBIOGET_VSCREENINFO, &myfb->fbvar);
 
 		if(ret < 0)
 		{
@@ -202,7 +198,7 @@ struct myfb_info* myfb_open (void)
 
 
 		//ret = ioctl(fbfd, FBIOGET_FSCREENINFO, &fbfix);
-		ret=ioctl(fbfd, FBIOGET_FSCREENINFO, &myfb->fbfix);
+		ret=ioctl(myfb->fd, FBIOGET_FSCREENINFO, &myfb->fbfix);
 
 		if(ret < 0)
 		{
@@ -212,7 +208,7 @@ struct myfb_info* myfb_open (void)
 
 
 
-		myfb->fb=(unsigned short *)mmap(0, myfb->fbvar.xres*myfb->fbvar.yres*16/8,PROT_READ|PROT_WRITE, MAP_SHARED, fbfd, 0);
+		myfb->fb=(unsigned short *)mmap(0, myfb->fbvar.xres*myfb->fbvar.yres*16/8,PROT_READ|PROT_WRITE, MAP_SHARED, myfb->fd, 0);
 
 		memset (myfb->fb,0, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
 
@@ -225,3 +221,9 @@ struct myfb_info* myfb_open (void)
 		return myfb;
 	}
 
+void myfb_close(struct myfb_info *myfb)
+{
+	munmap(myfb->fb, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
+	close(myfb->fd);
+	free(myfb);
+}
