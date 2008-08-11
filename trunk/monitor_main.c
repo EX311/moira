@@ -10,9 +10,9 @@
 
 #include "font.h"
 #include "oo.h"
+#include "fb-util.h"
 
 #define	MIN(x, y)	((x) > (y) ? (y) : (x))
-#define	FBDEVFILE	"/dev/fb0"
 #define	PORT	8192
 #define	BUFSIZE	8192*16
 
@@ -22,23 +22,14 @@
 #define	YRES	240
 
 typedef unsigned char ubyte;
+struct color white = {0xff, 0xff, 0xff};
+struct color black = {0,0,0};
 
 static void sig(int sig)
 {
 	fflush(stderr);
 	printf("Quit - Sig #%d caught\n", sig);
 	exit(2);
-}
-
-static unsigned short makepixel(struct fb_var_screeninfo *pfbvar, ubyte r, ubyte g, ubyte b)
-{
-	unsigned short rnew, gnew, bnew;
-
-	rnew = r >> (8-pfbvar->red.length);
-	gnew = g >> (8-pfbvar->green.length);
-	bnew = b >> (8-pfbvar->blue.length);
-
-	return (unsigned short) ((rnew << pfbvar->red.offset) | (gnew << pfbvar->green.offset) | (bnew << pfbvar->blue.offset));
 }
 
 void put_char(int x, int y, int c, int colidx, unsigned short *pfbmap, struct fb_var_screeninfo *fbvar)
@@ -48,7 +39,7 @@ void put_char(int x, int y, int c, int colidx, unsigned short *pfbmap, struct fb
 		bits = font_vga_8x8.data [font_vga_8x8.height * c + i];
 		for (j = 0; j < font_vga_8x8.width; j++, bits <<= 1)
 			if (bits & 0x80)
-				*(pfbmap+(y+i)*fbvar->xres+(x+j)) = makepixel(fbvar, WHITE, WHITE, WHITE);
+				*(pfbmap+(y+i)*fbvar->xres+(x+j)) = makepixel(white);
 	}
 }
 
@@ -70,7 +61,7 @@ void clear_screen(unsigned short *pfbmap, struct fb_var_screeninfo *fbvar)
 	int i, j;
 	for (i = 0; i < fbvar->yres; i++)
 		for (j = 0; j < fbvar->xres; j++)
-			*(pfbmap+i*fbvar->xres+j) = makepixel(fbvar, BLACK, BLACK, BLACK);
+			*(pfbmap+i*fbvar->xres+j) = makepixel(black);
 	put_string (fbvar->xres/4, fbvar->yres/8, ">> theMeal Project Monitor program", 1, pfbmap, fbvar);
 	put_string (fbvar->xres/4, fbvar->yres/8+20, ">> Code by amoolove", 2, pfbmap, fbvar);
 	put_string (fbvar->xres/2+150 , fbvar->yres/2 + fbvar->yres/4, "theMeal Project 2008", 3, pfbmap, fbvar);
@@ -82,10 +73,10 @@ void show_grid(unsigned short *pfbmap, struct fb_var_screeninfo *fbvar)
 
 	for (i = (fbvar->yres/2)-YRES; i<= (fbvar->yres/2)+YRES; i++)
 		for (j = (fbvar->xres/2)-XRES; j<= (fbvar->xres/2)+XRES; j+=XRES)
-			*(pfbmap+i*fbvar->xres+j) = makepixel(fbvar, WHITE, WHITE, WHITE);
+			*(pfbmap+i*fbvar->xres+j) = makepixel(white);
 	for (i = (fbvar->yres/2)-YRES; i<= (fbvar->yres/2)+YRES; i+=YRES)
 		for (j = (fbvar->xres/2)-XRES; j<= (fbvar->xres/2)+XRES; j++)
-			*(pfbmap+i*fbvar->xres+j) = makepixel(fbvar, WHITE, WHITE, WHITE);
+			*(pfbmap+i*fbvar->xres+j) = makepixel(white);
 }
 
 int main(int argc, char *argv[])
@@ -146,6 +137,7 @@ int main(int argc, char *argv[])
 				fb_data = (struct oo_fb_data *)(buff+i*sizeof(struct oo_fb_data));
 				*(pfbmap+fb_data->offset) = fb_data->pix_data;
 			}
+			show_grid(pfbmap, &fbvar);
 		}
 		close(clnt_sock);
 	}

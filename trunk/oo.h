@@ -18,11 +18,11 @@ struct oo_i_data {
 
 struct oo_fb_data {
 	int offset;
-	int pix_data;
+	unsigned short pix_data;
 };
 
 extern int ip2port(char *);
-extern int tcp_server_listen(char *, int);
+extern int tcp_server_listen(int, int);
 extern int tcp_server_accept(int);
 extern int tcp_client_connect(char *, char *);
 extern int input_send(int, struct oo_i_data *,int);

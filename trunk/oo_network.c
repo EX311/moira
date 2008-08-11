@@ -38,7 +38,7 @@ int ip2port(char *ip)
  * with string of port NO. and count of listen socket
  * returns socket fd
  */
-int tcp_server_listen(char *port, int num)
+int tcp_server_listen(int port, int num)
 {
 	int ret;
 	int sock;
@@ -51,7 +51,7 @@ int tcp_server_listen(char *port, int num)
 	memset(&serv_addr, 0, sizeof(struct sockaddr_in));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv_addr.sin_port = htons(atoi(port));
+	serv_addr.sin_port = htons(port);
 
 	ret = bind(sock, (struct sockaddr *)&serv_addr, sizeof(struct sockaddr_in));
 	if (ret == -1)
@@ -149,11 +149,11 @@ struct oo_fb_data *fb_recv(int sock, char *buff, int *size)
 	return (struct oo_fb_data *)buff;
 }	
 
-int data4monitor(struct oo_fb_data *data, int offset, int data)
+int data4monitor(struct oo_fb_data *fb_data, int offset, int data)
 {
-	if (data) {
-		oo_fb_data->offset = offset;
-		oo_fb_data->pix_data = data;
+	if (fb_data) {
+		fb_data->offset = offset;
+		fb_data->pix_data = data;
 		return 0;
 	}
 	return -1;
