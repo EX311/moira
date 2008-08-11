@@ -16,12 +16,6 @@
 
 #include "fb-util.h"
 
-
-
-#define FBDEVFILE "/dev/fb0"
-
-
-
 #define DEBUG 0
 
 /*

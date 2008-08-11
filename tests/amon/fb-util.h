@@ -7,6 +7,7 @@
 //struct fb_fix_screeninfo* fbfix;
 //struct color color;
 
+#define FBDEVFILE "/dev/fb0"
 
 #define VFB_MAX 4
 
@@ -27,7 +28,7 @@ struct myfb_info
 //char* vfb_list[VFB_MAX] ; 
 unsigned short* vfb_list[VFB_MAX] ; 
 
-
+extern unsigned short makepixel(struct color);
 extern void drow_pixel(int x, int y, struct color);
 extern void drow_line(int x1, int y1, int x2, int y2, struct color color);
 extern void drow_rect (int x1, int y1, int x2, int y2, struct color color);
