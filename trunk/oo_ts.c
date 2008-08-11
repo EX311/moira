@@ -1,3 +1,7 @@
+/*
+ * code by amoolove
+ */
+
 #include "tslib.h"
 /* physical framebuffer postion to virtual postion */
 struct ts_sample phy2vir_pos(struct ts_sample p, unsigned int my_location)

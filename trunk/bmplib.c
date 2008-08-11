@@ -3,7 +3,7 @@
  *            only little endian machine supported
  *
  * Copyright(C) 2002 holelee
- *
+ * modified by amoolove
  */
 
 #include <stdio.h>

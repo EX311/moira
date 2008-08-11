@@ -1,3 +1,8 @@
+/* 
+ * theMeal Project Monitor Program
+ * code by amoolove
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
