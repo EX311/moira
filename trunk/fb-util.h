@@ -39,3 +39,15 @@ extern void show_vfb(unsigned short* vfb);
 extern void buf_pixel(unsigned short* buf ,int x, int y, struct color color);
 
 extern struct myfb_info* myfb_open (void);
+// add functions for BMP
+struct bmphandle_s;
+
+typedef struct bmphandle_s *bmphandle_t;
+
+bmphandle_t bmp_open(const char *filename);
+void bmp_close(bmphandle_t bh);
+
+int bmp_height(bmphandle_t bh);
+int bmp_width(bmphandle_t bh);
+
+struct color bmp_getpixel(bmphandle_t bh, int x, int y);
