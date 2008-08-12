@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include "read_proc.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 int IsConnect_fd_return(void)
 {
