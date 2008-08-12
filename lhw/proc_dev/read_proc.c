@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include "read_proc.h"
 
 #define DEBUG 0
 
