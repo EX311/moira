@@ -18,14 +18,30 @@
 struct proc_dir_entry *board_status_fp=NULL;
 struct proc_dir_entry *IsConnect_fp=NULL;
 struct proc_dir_entry *IpInfo_fp=NULL;
+struct proc_dir_entry *IpInfo0_fp=NULL;
+struct proc_dir_entry *IpInfo1_fp=NULL;
+struct proc_dir_entry *IpInfo2_fp=NULL;
+struct proc_dir_entry *IpInfo3_fp=NULL;
 struct proc_dir_entry *AfterMasterIp_fp=NULL;
+struct proc_dir_entry *AfterMasterIp0_fp=NULL;
+struct proc_dir_entry *AfterMasterIp1_fp=NULL;
+struct proc_dir_entry *AfterMasterIp2_fp=NULL;
+struct proc_dir_entry *AfterMasterIp3_fp=NULL;
 struct proc_dir_entry *MyLocation_fp=NULL;
 struct proc_dir_entry *MasterLocation_fp=NULL;
 struct proc_dir_entry *DeviceAttached_fp=NULL;
 
 char IsConnect_data[DATASIZE]={0,};
 char IpInfo_data[DATASIZE]={0,};
+char IpInfo0_data[DATASIZE]={0,};
+char IpInfo1_data[DATASIZE]={0,};
+char IpInfo2_data[DATASIZE]={0,};
+char IpInfo3_data[DATASIZE]={0,};
 char AfterMasterIp_data[DATASIZE]={0,};
+char AfterMasterIp0_data[DATASIZE]={0,};
+char AfterMasterIp1_data[DATASIZE]={0,};
+char AfterMasterIp2_data[DATASIZE]={0,};
+char AfterMasterIp3_data[DATASIZE]={0,};
 char MyLocation_data[DATASIZE]={0,};
 char MasterLocation_data[DATASIZE]={0,};
 char DeviceAttached_data[DATASIZE]={0,};
@@ -209,22 +225,69 @@ int board_status_init(void)
 		IsConnect_fp->write_proc=set_IsConnect;
 	}
 
-	IpInfo_fp = create_proc_entry("IpInfo", S_IFREG | S_IRWXU, board_status_fp);
-	if(IpInfo_fp)
+	IpInfo_fp = proc_mkdir("IpInfo",board_status_fp);
+	IpInfo0_fp = create_proc_entry("IpInfo0", S_IFREG | S_IRWXU, IpInfo_fp);
+	if(IpInfo0_fp)
 	{
-		IpInfo_fp->data=IpInfo_data;
-		IpInfo_fp->read_proc=get_IpInfo;
-		IpInfo_fp->write_proc=set_IpInfo;
+		IpInfo0_fp->data=IpInfo0_data;
+		IpInfo0_fp->read_proc=get_IpInfo;
+		IpInfo0_fp->write_proc=set_IpInfo;
 	}
 
-	AfterMasterIp_fp = create_proc_entry("AfterMasterIp", S_IFREG | S_IRWXU, board_status_fp);
-	if(AfterMasterIp_fp)
+	IpInfo1_fp = create_proc_entry("IpInfo1", S_IFREG | S_IRWXU, IpInfo_fp);
+	if(IpInfo1_fp)
 	{
-		AfterMasterIp_fp->data=AfterMasterIp_data;
-		AfterMasterIp_fp->read_proc=get_AfterMasterIp;
-		AfterMasterIp_fp->write_proc=set_AfterMasterIp;
+		IpInfo1_fp->data=IpInfo1_data;
+		IpInfo1_fp->read_proc=get_IpInfo;
+		IpInfo1_fp->write_proc=set_IpInfo;
+	}
+	
+	IpInfo2_fp = create_proc_entry("IpInfo2", S_IFREG | S_IRWXU, IpInfo_fp);
+	if(IpInfo2_fp)
+	{
+		IpInfo2_fp->data=IpInfo2_data;
+		IpInfo2_fp->read_proc=get_IpInfo;
+		IpInfo2_fp->write_proc=set_IpInfo;
 	}
 
+	IpInfo3_fp = create_proc_entry("IpInfo3", S_IFREG | S_IRWXU, IpInfo_fp);
+	if(IpInfo3_fp)
+	{
+		IpInfo3_fp->data=IpInfo3_data;
+		IpInfo3_fp->read_proc=get_IpInfo;
+		IpInfo3_fp->write_proc=set_IpInfo;
+	}
+
+	AfterMasterIp_fp = proc_mkdir("AfterMasterIp",board_status_fp);
+	AfterMasterIp0_fp = create_proc_entry("AfterMasterIp0", S_IFREG | S_IRWXU, AfterMasterIp_fp);
+	if(AfterMasterIp0_fp)
+	{
+		AfterMasterIp0_fp->data=AfterMasterIp0_data;
+		AfterMasterIp0_fp->read_proc=get_AfterMasterIp;
+		AfterMasterIp0_fp->write_proc=set_AfterMasterIp;
+	}
+	AfterMasterIp1_fp = create_proc_entry("AfterMasterIp1", S_IFREG | S_IRWXU, AfterMasterIp_fp);
+	if(AfterMasterIp1_fp)
+	{
+		AfterMasterIp1_fp->data=AfterMasterIp1_data;
+		AfterMasterIp1_fp->read_proc=get_AfterMasterIp;
+		AfterMasterIp1_fp->write_proc=set_AfterMasterIp;
+	}
+	AfterMasterIp2_fp = create_proc_entry("AfterMasterIp2", S_IFREG | S_IRWXU, AfterMasterIp_fp);
+	if(AfterMasterIp2_fp)
+	{
+		AfterMasterIp2_fp->data=AfterMasterIp2_data;
+		AfterMasterIp2_fp->read_proc=get_AfterMasterIp;
+		AfterMasterIp2_fp->write_proc=set_AfterMasterIp;
+	}
+	AfterMasterIp3_fp = create_proc_entry("AfterMasterIp3", S_IFREG | S_IRWXU, AfterMasterIp_fp);
+	if(AfterMasterIp3_fp)
+	{
+		AfterMasterIp3_fp->data=AfterMasterIp3_data;
+		AfterMasterIp3_fp->read_proc=get_AfterMasterIp;
+		AfterMasterIp3_fp->write_proc=set_AfterMasterIp;
+	}
+	
 	MyLocation_fp = create_proc_entry("MyLocation", S_IFREG | S_IRWXU, board_status_fp);
 	if(MyLocation_fp)
 	{
@@ -254,6 +317,21 @@ int board_status_init(void)
 
 void board_status_exit(void)
 {
+remove_proc_entry("AfterMasterIp0",AfterMasterIp_fp);
+remove_proc_entry("AfterMasterIp1",AfterMasterIp_fp);
+remove_proc_entry("AfterMasterIp2",AfterMasterIp_fp);
+remove_proc_entry("AfterMasterIp3",AfterMasterIp_fp);
+
+remove_proc_entry("IpInfo0",IpInfo_fp);
+remove_proc_entry("IpInfo1",IpInfo_fp);
+remove_proc_entry("IpInfo2",IpInfo_fp);
+remove_proc_entry("IpInfo3",IpInfo_fp);
+
+remove_proc_entry("AfterMasterIp",board_status_fp);
+remove_proc_entry("IpInfo",board_status_fp);
+remove_proc_entry("DeviceAttached",board_status_fp);
+remove_proc_entry("MasterLocation",board_status_fp);
+remove_proc_entry("MyLocation",board_status_fp);
 remove_proc_entry("IsConnect",board_status_fp);
 remove_proc_entry("board_status",0);
 
