@@ -1,4 +1,3 @@
-#include <stdio.h>
 
 // read_proc_fd
 int IsConnect_fd_return(void);
