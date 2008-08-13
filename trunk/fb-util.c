@@ -226,6 +226,10 @@ struct myfb_info* myfb_open (void)
 		return myfb;
 }
 
+/*
+ * Under this line Added by amoolove
+ */
+
 void myfb_close(void)
 {
 	munmap(myfb->fb, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
