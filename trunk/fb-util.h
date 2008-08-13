@@ -37,6 +37,8 @@ extern unsigned short makepixel(struct color);
 extern void drow_pixel(int x, int y, struct color);
 extern void drow_line(int x1, int y1, int x2, int y2, struct color color);
 extern void drow_rect (int x1, int y1, int x2, int y2, struct color color); //(x1,y1),(x2,y2) ë‘ ì ìœ¼ë¡œ í•˜ëŠ” ì‚¬ê°í˜•
+extern void  drow_ploat_circle( int x_center, int y_center, int radius, struct color color);  // ºó¿ø draw (x, y, radius, color)
+extern void  drow_inner_circle( int x_center, int y_center, int radius, struct color color);  // ²ËÂù¿ø draw (x, y, radius, color)
 
 //extern char** set_vfb_buf(int n);
 
