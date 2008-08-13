@@ -61,6 +61,3 @@ int bmp_width(bmphandle_t bh);
 
 struct color bmp_getpixel(bmphandle_t bh, int x, int y);
 
-void buf_bmp(bmphandle_t, int, int);
-void monitor_bmp(bmphandle_t, int, int, struct oo_fb_data *);
-void clear_screen(void);
