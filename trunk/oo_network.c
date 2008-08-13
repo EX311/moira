@@ -85,7 +85,7 @@ int tcp_server_accept(int serv_sock)
  * with string of server address and port NO.
  * returns socket fd
  */
-int tcp_client_connect(char *server_addr, char *port)
+int tcp_client_connect(char *server_addr, int port)
 {
 	int ret;
 	int sock;
@@ -98,7 +98,7 @@ int tcp_client_connect(char *server_addr, char *port)
 	memset(&serv_addr, 0, sizeof(struct sockaddr_in));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = inet_addr(server_addr);
-	serv_addr.sin_port = htons(atoi(port));
+	serv_addr.sin_port = htons(port);
 
 	ret = connect(sock, (struct sockaddr *)&serv_addr, sizeof(struct sockaddr_in));
 	if (ret == -1)

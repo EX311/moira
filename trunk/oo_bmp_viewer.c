@@ -24,8 +24,7 @@ int main(int argc, char *argv[])
 {
 	int i, ret;
 	int sock[VFB_MAX];
-	char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.1.50", "192.168.1.51", "192.168.1.52"};
-	char *port[VFB_MAX] = {"8192", "5001", "5002", "5003"};
+	char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.30", "192.168.77.55", "192.168.77.77"};
 	struct oo_fb_data *buf_monitor;
 	bmphandle_t bh;
 
@@ -36,23 +35,23 @@ int main(int argc, char *argv[])
 
 	myfb = myfb_open();
 
-	sock[0] = tcp_client_connect(ipaddr[0], port[0]);
+	sock[0] = tcp_client_connect(ipaddr[0], 8192);
 	if (sock < 0) {
 		perror("tcp connect");
 		exit(1);
 	}
-	sock[1] = tcp_client_connect(ipaddr[1], port[1]);
-	if (sock < 0) {
-		perror("tcp connect");
-		exit(1);
-	}
-	sock[2] = tcp_client_connect(ipaddr[2], port[2]);
+	sock[1] = tcp_client_connect(ipaddr[1], ip2port(ipaddr[1]));
 	if (sock < 0) {
 		perror("tcp connect");
 		exit(1);
 	}
 /*
-	sock[3] = tcp_client_connect(ipaddr[3], port[3]);
+	sock[2] = tcp_client_connect(ipaddr[2], ip2port(ipaddr[2]));
+	if (sock < 0) {
+		perror("tcp connect");
+		exit(1);
+	}
+	sock[3] = tcp_client_connect(ipaddr[3], ip2port(ipaddr[3]));
 	if (sock < 0) {
 		perror("tcp connect");
 		exit(1);
