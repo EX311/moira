@@ -271,8 +271,9 @@ void buf_pixel(int x, int y, struct color color)
 	offset =y * myfb->fbvar.xres + x;
 	pixel = makepixel(color);
 		
-	if(offset > -1 && offset <= myfb->fbfix.smem_len )
+	if(offset > -1 && offset <= myfb->fbfix.smem_len ) {
 		*(vfb_list[location]+offset) = pixel ;
+	}
 }
 
 void show_vfb(unsigned short* vfb)

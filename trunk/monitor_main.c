@@ -62,9 +62,8 @@ void put_string_center(int x, int y, char *s, unsigned colidx)
 	put_string (x - (sl / 2) * font_vga_8x8.width, y - font_vga_8x8.height / 2, s, colidx);
 }
 
-void clear_screen(void)
+void put_monitor(void)
 {
-	memset(myfb->fb, 0, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
 	put_string (myfb->fbvar.xres/4, myfb->fbvar.yres/4-25, ">> theMeal Project Monitor program", 1);
 	put_string (myfb->fbvar.xres/4, myfb->fbvar.yres/4-10, ">> Code by amoolove", 2);
 	put_string (myfb->fbvar.xres/2+150 , myfb->fbvar.yres/2 + myfb->fbvar.yres/4, "theMeal Project 2008", 3);
@@ -79,7 +78,7 @@ void show_grid(void)
 
 int main(int argc, char *argv[])
 {
-	int i, ret, cnt;
+	int ret, cnt, i;
 	int serv_sock, clnt_sock;
 	unsigned short *start_fbp;
 	char buff[BUFSIZE];
@@ -98,6 +97,7 @@ int main(int argc, char *argv[])
 		exit(1);
 /* initialize */
 	clear_screen();
+	put_monitor();
 	show_grid();
 	
 /* main process */
@@ -111,12 +111,15 @@ int main(int argc, char *argv[])
 
 		while ( (ret = read(clnt_sock, buff, BUFSIZE)) != 0) {
 			cnt += ret;
-			printf("READ: #%d\n", cnt);
+#ifdef DEBUG
+			printf("READ: #%d Total: #%d\n", ret, cnt);
+#endif
 			for (i=0; i<ret; i+=sizeof(struct oo_fb_data)) {
 				buf_data = (struct oo_fb_data *)&(buff[i]);
-//				*(start_fbp+buf_data->offset) = buf_data->pix_data;
+				*(start_fbp+buf_data->offset) = buf_data->pix_data;
 				memcpy(start_fbp+(buf_data->offset), &(buf_data->pix_data), sizeof(unsigned short));
 			}
+			cnt = 0;
 			show_grid();
 		}
 		close(clnt_sock);
