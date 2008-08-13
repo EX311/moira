@@ -1,4 +1,9 @@
 
+#define TOP 	0x2
+#define BOTTOM 	0x8
+#define LEFT 	0x1
+#define RIGHT 	0x4
+
 // read_proc_fd
 int IsConnect_fd_return(void);
 int IpInfo_fd_return(int num);

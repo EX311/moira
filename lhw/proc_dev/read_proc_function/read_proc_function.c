@@ -19,6 +19,31 @@ char get_IsConnect(void)
 	return buf[0];
 }
 
+/* when we had last meeting we were all agreed to follow this rule.
+ * place == 1 -> LEFT
+ * place == 2 -> TOP
+ * place == 4 -> RIGHT
+ * place == 8 -> BOTTOM
+ * and keep the status of connection with 4 bit binary number.
+ * To do that we should convert integer(place) to binary. 
+ *
+ *
+ * or why don't we just change this function to check four-character variable buf?
+ *
+ * we just suppose place==0 is LEFT
+ * 		   place==1 is TOP
+ * 		   place==2 is RIGHT
+ * 		   place==3 is BOTTOm
+ * and set buf[place] = '1' . 
+ * because we transfer data in character array format.
+ * so I think we don't have to bother converting them into decimal or binary..
+ *
+ * it's your choice whether you make changes or not. 
+ * and I didn't change the code of this file. 
+ * we'll talk about this tomorrow when you see this.
+ *
+ * -DEE-
+ * */
 int set_IsConnect(int  place)
 {
 	int fd;

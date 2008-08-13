@@ -1,9 +1,10 @@
 #include "read_proc.h"
 
+
 int main(void)
 {
 	{
-	int IsConnect_place=2;
+	int IsConnect_place=TOP;
 	char IsConnect_res;
 	set_IsConnect(IsConnect_place);
 	IsConnect_res=get_IsConnect();
