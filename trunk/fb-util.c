@@ -11,7 +11,7 @@
 #include <sys/mman.h> /* for mmap */
 #include <string.h> /*for memcpy */
 
-#include "fb-util.h"
+#include "oo.h"
 
 #define DEBUG 0
 
@@ -40,13 +40,12 @@ void drow_pixel(int x, int y, struct color color)
 	unsigned short pixel;
 	int offset ;
 	
-	offset =y * myfb->fbvar.xres + x;
+	offset = y * myfb->fbvar.xres + x;
 
 	pixel = makepixel(color);
 
 	if(offset > -1 && offset <= myfb->fbfix.smem_len )
-		*(myfb->fb+offset) = pixel ;
-
+		*(myfb->fb+offset) = pixel;
 }
 
 void drow_line(int x1, int y1, int x2, int y2, struct color color)
@@ -244,7 +243,7 @@ void buf_bmp(bmphandle_t bh, int x, int y)
 	for (i = 0; i < bmp_height(bh); i++)
 		for (j = 0; j < bmp_width(bh); j++) {
 			pixel = bmp_getpixel(bh, j, i);
-			buf_pixel(vfb_list[0],j+x,i+y,pixel);
+			buf_pixel(j+x,i+y,pixel);
 		}
 }
 

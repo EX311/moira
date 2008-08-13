@@ -13,7 +13,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#include "tslib.h"
 #include "oo.h"
 
 extern struct myfb_info *myfb;

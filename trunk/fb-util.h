@@ -47,9 +47,6 @@ extern void buf_pixel(int x, int y, struct color color); // color의 생상을 �
 
 extern struct myfb_info* myfb_open (void);
 extern void myfb_close(void);
-extern void buf_bmp(bmphandle_t, int, int);
-extern void monitor_bmp(bmphandle_t, int, int, struct oo_fb_data *);
-extern void clear_screen(void);
 
 // add functions for BMP
 struct bmphandle_s;
@@ -63,3 +60,7 @@ int bmp_height(bmphandle_t bh);
 int bmp_width(bmphandle_t bh);
 
 struct color bmp_getpixel(bmphandle_t bh, int x, int y);
+
+void buf_bmp(bmphandle_t, int, int);
+void monitor_bmp(bmphandle_t, int, int, struct oo_fb_data *);
+void clear_screen(void);
