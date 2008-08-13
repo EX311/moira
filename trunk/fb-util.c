@@ -232,3 +232,32 @@ void myfb_close(void)
 	close(myfb->fd);
 	free(myfb);
 }
+
+void buf_bmp(bmphandle_t bh, int x, int y)
+{
+	int i, j;
+	struct color pixel;
+	for (i = 0; i < bmp_height(bh); i++)
+		for (j = 0; j < bmp_width(bh); j++) {
+			pixel = bmp_getpixel(bh, j, i);
+			buf_pixel(vfb_list[0],j+x,i+y,pixel);
+		}
+}
+
+void monitor_bmp(bmphandle_t bh, int x, int y, struct oo_fb_data *data)
+{
+	int i, j, k = 0;
+	struct color pixel;
+	for (i=0; i<bmp_height(bh); i++)
+			for (j=0; j<bmp_width(bh); j++) {
+				pixel = bmp_getpixel(bh, j, i);
+				data4monitor(data+k, x+j, y+i, makepixel(pixel));
+				k++;
+			}
+}
+
+void clear_screen(void)
+{
+	memset(myfb->fb, 0, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
+}
+

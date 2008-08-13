@@ -16,6 +16,8 @@
 #include "tslib.h"
 #include "oo.h"
 
+extern struct myfb_info *myfb;
+
 int error_handling(char *message)
 {
 	fputs(message, stderr);
@@ -131,7 +133,7 @@ struct oo_i_data *input_recv(int sock, char *buff)
 /* with socket fd, fb data structure, send data size
  * returns writing data size
  */
-int fb_send(int sock, struct oo_fb_data *data, int size)
+int fb_send(int sock, unsigned short *data, int size)
 {
 	int ret;
 	ret = write(sock, data, size);
@@ -149,14 +151,27 @@ struct oo_fb_data *fb_recv(int sock, char *buff, int *size)
 	return (struct oo_fb_data *)buff;
 }	
 
-int data4monitor(struct oo_fb_data *fb_data, int offset, int data)
+int data4monitor(struct oo_fb_data *fb_data, int x, int y, unsigned short data)
 {
 	if (fb_data) {
-		fb_data->offset = offset;
+		fb_data->offset = y * M_XRES + x;
 		fb_data->pix_data = data;
 		return 0;
 	}
 	return -1;
 }
 
+struct oo_fb_data *alloc_net_buf(int size)
+{
+	struct oo_fb_data *buf = (struct oo_fb_data *)malloc(size);
+	return buf;
+}
 
+int free_net_buf(struct oo_fb_data *buf)
+{
+	if (buf) {
+		free(buf);
+		return 0;
+	}
+	return -1;
+}

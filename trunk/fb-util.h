@@ -26,7 +26,7 @@ struct myfb_info
 	struct fb_fix_screeninfo fbfix;
 };
 
-unsigned short* vfb_list[VFB_MAX] ;// VFB data point's list 
+extern unsigned short* vfb_list[VFB_MAX] ;// VFB data point's list 
 
 extern unsigned short makepixel(struct color);
 
@@ -47,6 +47,10 @@ extern void buf_pixel(int x, int y, struct color color); // color의 생상을 �
 
 extern struct myfb_info* myfb_open (void);
 extern void myfb_close(void);
+extern void buf_bmp(bmphandle_t, int, int);
+extern void monitor_bmp(bmphandle_t, int, int, struct oo_fb_data *);
+extern void clear_screen(void);
+
 // add functions for BMP
 struct bmphandle_s;
 

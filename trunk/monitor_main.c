@@ -15,7 +15,6 @@
 
 #include "font.h"
 #include "oo.h"
-#include "fb-util.h"
 
 #define	MIN(x, y)	((x) > (y) ? (y) : (x))
 #define	PORT	8192
@@ -31,7 +30,6 @@ struct color white = {0xff, 0xff, 0xff};
 struct color black = {0,0,0};
 
 extern struct myfb_info *myfb;
-extern unsigned short *vfb_list[VFB_MAX];
 
 static void sig(int sig)
 {
@@ -81,10 +79,11 @@ void show_grid(void)
 
 int main(int argc, char *argv[])
 {
-	int i, ret;
+	int i, ret, cnt;
 	int serv_sock, clnt_sock;
-	struct oo_fb_data *fb_data;
+	unsigned short *start_fbp;
 	char buff[BUFSIZE];
+	struct oo_fb_data *buf_data;
 
 	signal(SIGSEGV, sig);
 	signal(SIGINT, sig);
@@ -107,12 +106,16 @@ int main(int argc, char *argv[])
 		if (clnt_sock < 0)
 			exit(1);
 
-		printf("clnt sock #%d\n", clnt_sock);
+		cnt = 0;
+		start_fbp = myfb->fb + (272 * myfb->fbvar.xres + 320);
+
 		while ( (ret = read(clnt_sock, buff, BUFSIZE)) != 0) {
-			printf("READ: #%d\n", ret);
-			for (i=0; i<ret/sizeof(struct oo_fb_data); i++) {
-				fb_data = (struct oo_fb_data *)(buff+i*sizeof(struct oo_fb_data));
-				*(myfb->fb+fb_data->offset) = fb_data->pix_data;
+			cnt += ret;
+			printf("READ: #%d\n", cnt);
+			for (i=0; i<ret; i+=sizeof(struct oo_fb_data)) {
+				buf_data = (struct oo_fb_data *)&(buff[i]);
+//				*(start_fbp+buf_data->offset) = buf_data->pix_data;
+				memcpy(start_fbp+(buf_data->offset), &(buf_data->pix_data), sizeof(unsigned short));
 			}
 			show_grid();
 		}
