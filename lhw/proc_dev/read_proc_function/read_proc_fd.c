@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include "read_proc.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 int IsConnect_fd_return(void)
 {
@@ -142,7 +142,8 @@ int DeviceAttached_fd_return(void)
 	 return fd;
 }
 
-#ifdef DEBUG
+#if DEBUG 
+
 int main(void)
 {
 	int fd;
