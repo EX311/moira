@@ -1,11 +1,11 @@
+/*
+ * fb-util.h
+ *
+ *
+ */
 
 
 #include <linux/fb.h> /* for fb_var_screeninfo, FBIOGET_VSCREENINFO */
-
-
-//struct fb_var_screeninfo* fbvar;
-//struct fb_fix_screeninfo* fbfix;
-//struct color color;
 
 #define FBDEVFILE "/dev/fb0"
 
@@ -26,19 +26,24 @@ struct myfb_info
 	struct fb_fix_screeninfo fbfix;
 };
 
-//char* vfb_list[VFB_MAX] ; 
-unsigned short* vfb_list[VFB_MAX] ; 
+unsigned short* vfb_list[VFB_MAX] ;// VFB data point's list 
 
 extern unsigned short makepixel(struct color);
+
+/*
+ * daow 접두어 함수 : 프레임 버퍼 영역에 직접 pixel 단위로 표현하는 함수
+ */
+
 extern void drow_pixel(int x, int y, struct color);
 extern void drow_line(int x1, int y1, int x2, int y2, struct color color);
-extern void drow_rect (int x1, int y1, int x2, int y2, struct color color);
+extern void drow_rect (int x1, int y1, int x2, int y2, struct color color); //(x1,y1),(x2,y2) 두 점으로 하는 사각형
 
 //extern char** set_vfb_buf(int n);
-extern void set_vfb_buf(int n);
+
+extern void set_vfb_buf(int n); // n개의 vfb와 같은 크기의 메모리 공간을 동적 할당 각 메모리 포인터는  vfb_list[n]에 저장
 extern void free_vfb_buf(int n);
-extern void show_vfb(unsigned short* vfb);
-extern void buf_pixel(unsigned short* buf ,int x, int y, struct color color);
+extern void show_vfb(unsigned short* vfb); // vfb의 data를 FB에 출력
+extern void buf_pixel(int x, int y, struct color color); // color의 생상을 가진 점을 각 사분면의 맞게 set_vfb_buf() 에서 받은 공간에 저장
 
 extern struct myfb_info* myfb_open (void);
 extern void myfb_close(void);

@@ -127,7 +127,7 @@ void  free_vfb_buf(int n)
  * each vfb data is vfb_list[location]
  *
  */
-void buf_pixel(unsigned short* buf ,int x, int y, struct color color)
+void buf_pixel(int x, int y, struct color color)
 {
 	unsigned short pixel;
 	int offset ;
