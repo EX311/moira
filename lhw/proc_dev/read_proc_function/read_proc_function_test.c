@@ -1,8 +1,10 @@
 #include "read_proc.h"
-
+#include <stdio.h>
 
 int main(void)
 {
+
+
 	{
 	int IsConnect_place=TOP;
 	char IsConnect_res;
@@ -10,18 +12,20 @@ int main(void)
 	IsConnect_res=get_IsConnect();
 	printf("IsConnect_res = %c\n",IsConnect_res);
 	}
-/*
-	{
+
+
+{
 	int IpInfo_place;
 	int ip=111;
 	int cnt;
-	char get_ip[4];
+	char get_ip[4]={0,};
 		for(IpInfo_place=0;IpInfo_place<4;IpInfo_place++,ip++)
 		{
 			cnt= set_IpInfo(IpInfo_place, ip);
-			printf("set_IpInfo%d : ip=%s,cnt=%d\n",IpInfo_place,ip,cnt);
+			printf("set_IpInfo%d : ip=%d,cnt=%d\n",IpInfo_place,ip,cnt);
 			
 			cnt= get_IpInfo(IpInfo_place,get_ip);
+//			get_ip[cnt-1]='\n';
 			printf("get_IpInfo%d : ip=%s,cnt=%d\n",IpInfo_place,get_ip,cnt);
 		}
 	}
@@ -38,10 +42,11 @@ int main(void)
 			printf("set_AfterMasterIp%d : ip=%d,cnt=%d\n",AfterMasterIp_place,ip,cnt);
 			
 			cnt= get_AfterMasterIp(AfterMasterIp_place,get_ip);
-			printf("get_AfterMasterIp%d : ip=%d,cnt=%d\n",AfterMasterIp_place,get_ip,cnt);
+			printf("get_AfterMasterIp%d : ip=%s,cnt=%d\n",AfterMasterIp_place,get_ip,cnt);
 		}
 	
 	}
+	
 
 	{
 		int MyLocation=0;
@@ -71,5 +76,5 @@ int main(void)
 		printf("DeviceAttached = %d\n",get_DeviceAttached());
 	}
 	}
-	*/
+	
 }

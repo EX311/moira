@@ -66,9 +66,11 @@ int get_IpInfo(int place, char* get_data)
 	int fd;
 	int cnt;
 	int i;
-
+	memset(get_data,0,sizeof(get_data));
+	//printf("clear getdata = %s\n",get_data);
+	//printf("sizeof getdsta= %d\n",sizeof(get_data));
 	fd=IpInfo_fd_return(place);
-	cnt = read(fd,get_data,strlen(get_data));
+	cnt = read(fd,get_data,sizeof(get_data)-1);
 	#ifdef DEBUG
 	printf("get_IpInfo return value = %s\n",get_data);
 	#endif
@@ -79,7 +81,7 @@ return cnt;
 int set_IpInfo(int place, int ip)
 {
 	int fd;
-	char buf[1024]={0,};
+	char buf[4]={0,};
 	int cnt;
 	int i;
 
@@ -98,14 +100,14 @@ int get_AfterMasterIp(int place,char* get_data)
 	int fd;
 	int cnt;
 	int i;
-
+	memset(get_data,0,sizeof(get_data));
 	fd=AfterMasterIp_fd_return(place);
-	cnt = read(fd,get_data,strlen(get_data));
+	cnt = read(fd,get_data,sizeof(get_data)-1);
 #ifdef DEBUG
 	printf("get_AfterMasterIp return value = %s\n",get_data);
 #endif
 
-return 0;
+return cnt;
 
 }
 
@@ -123,7 +125,7 @@ int set_AfterMasterIp(int place, int ip)
 		printf("set_AfterMasterIp set value = %s\n",buf);
 #endif
 
-	return 0;
+	return 1;
 
 }
 
@@ -133,14 +135,14 @@ int get_MyLocation(void)
 	char buf;
 	int cnt;
 	int i;
-	
+	int res;
 	fd=MyLocation_fd_return();
 	cnt = read(fd,&buf,sizeof(buf));
 	#ifdef DEBUG
 	printf("get_MyLocation return value = %c\n",buf);
 #endif
-
-	return 0;
+	res=atoi(&buf);
+	return res;
 
 }
 
@@ -158,7 +160,7 @@ int set_MyLocation(int MyLocation)
 		printf("set_MyLocation set value = %c\n",buf);
 #endif
 
-	return 0;
+	return 1;
 
 }
 
@@ -167,6 +169,7 @@ int get_MasterLocation(void)
 	int fd;
 	char buf;
 	int cnt;
+	int res;
 
 	fd=MasterLocation_fd_return();
 	cnt = read(fd,&buf,sizeof(buf));
@@ -174,7 +177,9 @@ int get_MasterLocation(void)
 	printf("get_IsConnect return value = %c\n",buf);
 #endif
 
-	return 0;
+	res=atoi(&buf);
+
+	return res;
 
 }
 
@@ -192,7 +197,7 @@ int set_MasterLocation(int MasterLocation)
 		printf("set_MasterLocation set value = %c\n",buf);
 #endif
 
-	return 0;
+	return 1;
 
 }
 
@@ -202,14 +207,15 @@ int get_DeviceAttached(void)
 	int cnt;
 	char buf;
 	int i;
-
+	int res;
 	fd=DeviceAttached_fd_return();
-	cnt = read(fd,buf,sizeof(buf));
+	cnt = read(fd,&buf,sizeof(buf));
 	#ifdef DEBUG
 	printf("get_DeviceAttached return value = %c\n",buf);
 #endif
+	res=atoi(&buf);
 
-	return 0;
+	return res;
 
 }
 
@@ -227,7 +233,7 @@ int set_DeviceAttached(int DeviceAttached)
 		printf("set_DeviceAttached set value = %c\n",buf);
 #endif
 
-	return 0;
+	return 1;
 
 }
 
