@@ -170,6 +170,7 @@ void  drow_ploat_circle( int x_center, int y_center, int radius, struct color co
 		ploat_circle( x_center, y_center, x_coor, y_coor, &color);
 	
 	memcpy(myfb->fb, fb_mmap_temp, myfb->fbvar.xres*myfb->fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
+	free(fb_mmap_temp);
 }
 
 void  drow_inner_circle( int x_center, int y_center, int radius, struct color color)  // 꽉찬원 draw (x, y, radius, color)
@@ -202,6 +203,7 @@ void  drow_inner_circle( int x_center, int y_center, int radius, struct color co
 		inner_circle( x_center, y_center, x_coor, y_coor, &color);
 	
 	memcpy(myfb->fb, fb_mmap_temp, myfb->fbvar.xres*myfb->fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
+	free(fb_mmap_temp);
 }
 
 
