@@ -8,15 +8,16 @@
 char get_IsConnect(void)
 {
 	int fd;
-	char buf[4]={0,};
+	char buf=0;
 	int cnt;
 	fd=IsConnect_fd_return();
-	cnt = read(fd,buf,strlen(buf));
+	cnt = read(fd,&buf,sizeof(buf));
 
+	printf("cnt= %d\n",cnt);
 #ifdef DEBUG
-	printf("get_IsConnect return value = %c\n",buf[0]);
+	printf("get_IsConnect return value = %c\n",buf);
 #endif
-	return buf[0];
+	return buf;
 }
 
 /* when we had last meeting we were all agreed to follow this rule.
