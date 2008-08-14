@@ -105,7 +105,9 @@ int main(int argc, char *argv[])
 		clnt_sock = tcp_server_accept(serv_sock);
 		if (clnt_sock < 0)
 			exit(1);
-
+#ifdef DEBUG
+		printf("CONN SOCK #%d\n", clnt_sock);
+#endif
 		cnt = 0;
 		start_fbp = myfb->fb + (272 * myfb->fbvar.xres + 320);
 

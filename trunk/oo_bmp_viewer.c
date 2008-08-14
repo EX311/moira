@@ -45,12 +45,12 @@ int main(int argc, char *argv[])
 		perror("tcp connect");
 		exit(1);
 	}
+/*
 	sock[2] = tcp_client_connect(ipaddr[2], ip2port(ipaddr[2]));
 	if (sock < 0) {
 		perror("tcp connect");
 		exit(1);
 	}
-/*
 	sock[3] = tcp_client_connect(ipaddr[3], ip2port(ipaddr[3]));
 	if (sock < 0) {
 		perror("tcp connect");
@@ -71,13 +71,13 @@ int main(int argc, char *argv[])
 	buf_bmp(bh, 0, 0);
 
 	fb_send(sock[1], vfb_list[1], myfb->fbfix.smem_len);
-	fb_send(sock[2], vfb_list[2], myfb->fbfix.smem_len);
+//	fb_send(sock[2], vfb_list[2], myfb->fbfix.smem_len);
 //	fb_send(sock[3], vfb_list[3], myfb->fbfix.smem_len);
 
+	show_vfb(vfb_list[0]);
 	monitor_bmp(bh, 0, 0, buf_monitor);
 	ret = write(sock[0], buf_monitor, sizeof(struct oo_fb_data)*bmp_width(bh)*bmp_height(bh)*16/8);
 
-	show_vfb(vfb_list[0]);
 	/* clean up */
 	free_net_buf(buf_monitor);
 	free_vfb_buf(VFB_MAX);

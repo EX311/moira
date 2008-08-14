@@ -270,6 +270,9 @@ void buf_pixel(int x, int y, struct color color)
 		
 	}
 
+	if (x >= 640 || y >= 480)
+		return;
+
 	offset =y * myfb->fbvar.xres + x;
 	pixel = makepixel(color);
 		
