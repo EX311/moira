@@ -102,7 +102,7 @@ void  dot( int x, int y, struct color *color) // write color pixel
 	if ( 0 <= x && 0 <= y && x < myfb->fbvar.xres && y < myfb->fbvar.yres )
 	{
 		ptr   = fb_mmap_temp + myfb->fbvar.xres * y + x;  // offset
-		*ptr  = makeplixel(*color); // 임시 mmap변수 fb_mmap_temp에 픽셀을 write
+		*ptr  = makepixel(*color); // 임시 mmap변수 fb_mmap_temp에 픽셀을 write
 	}
 }
  
@@ -169,7 +169,7 @@ void  drow_ploat_circle( int x_center, int y_center, int radius, struct color co
 	if ( x_coor == y_coor)
 		ploat_circle( x_center, y_center, x_coor, y_coor, &color);
 	
-	memcpy(myfb->fb, fb_mmap_temp, fbvar.xres*fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
+	memcpy(myfb->fb, fb_mmap_temp, myfb->fbvar.xres*myfb->fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
 }
 
 void  drow_inner_circle( int x_center, int y_center, int radius, struct color color)  // 꽉찬원 draw (x, y, radius, color)
@@ -201,7 +201,7 @@ void  drow_inner_circle( int x_center, int y_center, int radius, struct color co
 	if ( x_coor == y_coor)
 		inner_circle( x_center, y_center, x_coor, y_coor, &color);
 	
-	memcpy(myfb->fb, fb_mmap_temp, fbvar.xres*fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
+	memcpy(myfb->fb, fb_mmap_temp, myfb->fbvar.xres*myfb->fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
 }
 
 
