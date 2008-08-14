@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 char get_IsConnect(void)
 {
@@ -13,8 +13,7 @@ char get_IsConnect(void)
 	fd=IsConnect_fd_return();
 	cnt = read(fd,&buf,sizeof(buf));
 
-	printf("cnt= %d\n",cnt);
-#ifdef DEBUG
+#if DEBUG
 	printf("get_IsConnect return value = %c\n",buf);
 #endif
 	return buf;
@@ -55,7 +54,7 @@ int set_IsConnect(int  place)
 	fd=IsConnect_fd_return();
 	write(fd,buf,strlen(buf));
 	
-#ifdef DEBUG
+#if DEBUG
 	printf("set_IsConnect set value = %d\n",place);
 #endif
 	return 1;
@@ -71,7 +70,7 @@ int get_IpInfo(int place, char* get_data)
 	//printf("sizeof getdsta= %d\n",sizeof(get_data));
 	fd=IpInfo_fd_return(place);
 	cnt = read(fd,get_data,sizeof(get_data)-1);
-	#ifdef DEBUG
+	#if DEBUG
 	printf("get_IpInfo return value = %s\n",get_data);
 	#endif
 
@@ -89,7 +88,7 @@ int set_IpInfo(int place, int ip)
 
 	fd=IpInfo_fd_return(place);
 	write(fd,&buf,strlen(buf));
-#ifdef DEBUG
+#if DEBUG
 	printf("set_IpInfo set value = %s\n",buf);
 #endif
 	return 1;
@@ -103,7 +102,7 @@ int get_AfterMasterIp(int place,char* get_data)
 	memset(get_data,0,sizeof(get_data));
 	fd=AfterMasterIp_fd_return(place);
 	cnt = read(fd,get_data,sizeof(get_data)-1);
-#ifdef DEBUG
+#if DEBUG
 	printf("get_AfterMasterIp return value = %s\n",get_data);
 #endif
 
@@ -121,7 +120,7 @@ int set_AfterMasterIp(int place, int ip)
 
 	fd=AfterMasterIp_fd_return(place);
 	write(fd,buf,strlen(buf));
-#ifdef DEBUG
+#if DEBUG
 		printf("set_AfterMasterIp set value = %s\n",buf);
 #endif
 
@@ -138,7 +137,7 @@ int get_MyLocation(void)
 	int res;
 	fd=MyLocation_fd_return();
 	cnt = read(fd,&buf,sizeof(buf));
-	#ifdef DEBUG
+	#if DEBUG
 	printf("get_MyLocation return value = %c\n",buf);
 #endif
 	res=atoi(&buf);
@@ -156,7 +155,7 @@ int set_MyLocation(int MyLocation)
 	sprintf(&buf,"%d",MyLocation);
 	fd=MyLocation_fd_return();
 	write(fd,&buf,1);
-#ifdef DEBUG
+#if DEBUG
 		printf("set_MyLocation set value = %c\n",buf);
 #endif
 
@@ -173,7 +172,7 @@ int get_MasterLocation(void)
 
 	fd=MasterLocation_fd_return();
 	cnt = read(fd,&buf,sizeof(buf));
-	#ifdef DEBUG
+	#if DEBUG
 	printf("get_IsConnect return value = %c\n",buf);
 #endif
 
@@ -193,7 +192,7 @@ int set_MasterLocation(int MasterLocation)
 	sprintf(&buf,"%d",MasterLocation);
 	fd=MasterLocation_fd_return();
 	write(fd,&buf,1);
-	#ifdef DEBUG
+	#if DEBUG
 		printf("set_MasterLocation set value = %c\n",buf);
 #endif
 
@@ -210,7 +209,7 @@ int get_DeviceAttached(void)
 	int res;
 	fd=DeviceAttached_fd_return();
 	cnt = read(fd,&buf,sizeof(buf));
-	#ifdef DEBUG
+	#if DEBUG
 	printf("get_DeviceAttached return value = %c\n",buf);
 #endif
 	res=atoi(&buf);
@@ -229,7 +228,7 @@ int set_DeviceAttached(int DeviceAttached)
 	sprintf(&buf,"%d",DeviceAttached);
 	fd=DeviceAttached_fd_return();
 	write(fd,&buf,1);
-#ifdef DEBUG
+#if DEBUG
 		printf("set_DeviceAttached set value = %c\n",buf);
 #endif
 
