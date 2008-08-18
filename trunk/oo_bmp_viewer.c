@@ -2,7 +2,7 @@
  * fbbmp.c : bmp drawing on frame buffer example
  *
  * Copyright(C) 2002 holelee
- *
+ * modified by amoolove
  */
 
 #include <stdio.h>
