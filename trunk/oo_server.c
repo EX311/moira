@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 		exit(1);
 
 	buff = (unsigned short *)malloc(myfb->fbfix.smem_len);
-	clear_screen();
+	printf("theMeal: oo_server started!\n");
 	
 /* main process */
 	while (1) {
