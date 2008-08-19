@@ -36,6 +36,10 @@ unsigned short makepixel(struct color color)
 	return (unsigned short)(((r>>3)<<11)|((g>>2)<<5)|(b>>3));
 }
 
+/*
+ reveres_pixel func run only 16 bpp
+  unsigned short pix_data -> struct color type
+*/
 struct color reveres_pixel(unsigned short pix)
 {
 	struct color color; 
