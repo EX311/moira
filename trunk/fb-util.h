@@ -30,6 +30,8 @@ extern unsigned short* vfb_list[VFB_MAX] ;// VFB data point's list
 
 extern unsigned short makepixel(struct color);
 
+
+extern struct color reveres_pixel(unsigned short pix);
 /*
  * daow 접두어 함수 : 프레임 버퍼 영역에 직접 pixel 단위로 표현하는 함수
  */

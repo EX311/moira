@@ -36,6 +36,21 @@ unsigned short makepixel(struct color color)
 	return (unsigned short)(((r>>3)<<11)|((g>>2)<<5)|(b>>3));
 }
 
+struct color reveres_pixel(unsigned short pix)
+{
+	struct color color; 
+	unsigned short r_mask = 0xf800 ;
+	unsigned short g_mask = 0x07e0 ;
+	unsigned short b_mask = 0x001f ;
+
+	color.r = (r_mask & pix)>>8 ;
+	color.g = (g_mask & pix)>>3 ;
+	color.b = (b_mask & pix)<<3 ;
+
+	return color;
+}
+
+
 void drow_pixel(int x, int y, struct color color)
 {
 	unsigned short pixel;
@@ -244,6 +259,8 @@ void buf_pixel(int x, int y, struct color color)
 	unsigned short pixel;
 	int offset ;
 	int location  ;
+	
+	struct color col ; //tmp val
 
 	if ( -1  < x && x <320 && -1< y  && y<240)
 	{
@@ -275,7 +292,7 @@ void buf_pixel(int x, int y, struct color color)
 
 	offset =y * myfb->fbvar.xres + x;
 	pixel = makepixel(color);
-		
+
 	if(offset > -1 && offset <= myfb->fbfix.smem_len ) {
 		*(vfb_list[location]+offset) = pixel ;
 	}

@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 {
 	int i, ret;
 	int sock[VFB_MAX];
-	char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.30", "192.168.77.55", "192.168.77.77"};
+	char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.20", "192.168.77.55", "192.168.77.77"};
 	struct oo_fb_data *buf_monitor;
 	bmphandle_t bh;
 
