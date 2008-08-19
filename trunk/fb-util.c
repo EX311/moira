@@ -263,8 +263,6 @@ void buf_pixel(int x, int y, struct color color)
 	unsigned short pixel;
 	int offset ;
 	int location  ;
-	
-	struct color col ; //tmp val
 
 	if ( -1  < x && x <320 && -1< y  && y<240)
 	{
