@@ -1,7 +1,7 @@
 /*
  * Header file for theMeal Project
  * code by amoolove
- *
+ * For Rev 100
  */
 
 #ifndef _OO_H
