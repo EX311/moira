@@ -20,7 +20,7 @@ extern struct myfb_info *myfb;
 int error_handling(char *message)
 {
 	fputs(message, stderr);
-	fputs(" error\n", stderr);
+	fputs(" failed\n", stderr);
 	return -1;
 }
 
@@ -101,8 +101,10 @@ int tcp_client_connect(char *server_addr, int port)
 	serv_addr.sin_port = htons(port);
 
 	ret = connect(sock, (struct sockaddr *)&serv_addr, sizeof(struct sockaddr_in));
-	if (ret == -1)
-		error_handling("connect()");
+	if (ret == -1) {
+		close(sock);
+		return error_handling("connect()");
+	}
 
 	return sock;
 }
