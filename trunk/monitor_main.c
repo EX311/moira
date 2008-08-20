@@ -13,7 +13,6 @@
 #include <sys/mman.h>
 #include <linux/fb.h>
 
-#include "font.h"
 #include "oo.h"
 
 #define	MIN(x, y)	((x) > (y) ? (y) : (x))
@@ -36,30 +35,6 @@ static void sig(int sig)
 	fflush(stderr);
 	printf("Quit - Sig #%d caught\n", sig);
 	exit(2);
-}
-
-void put_char(int x, int y, int c, int colidx)
-{
-	int i,j,bits;
-	for (i = 0; i < font_vga_8x8.height; i++) {
-		bits = font_vga_8x8.data [font_vga_8x8.height * c + i];
-		for (j = 0; j < font_vga_8x8.width; j++, bits <<= 1)
-			if (bits & 0x80)
-				drow_pixel(x+j, y+i, white);
-	}
-}
-
-void put_string(int x, int y, char *s, unsigned colidx)
-{
-	int i;
-	for (i = 0; *s; i++, x += font_vga_8x8.width, s++)
-		put_char (x, y, *s, colidx);
-}
-
-void put_string_center(int x, int y, char *s, unsigned colidx)
-{
-	size_t sl = strlen (s);
-	put_string (x - (sl / 2) * font_vga_8x8.width, y - font_vga_8x8.height / 2, s, colidx);
 }
 
 void put_monitor(void)

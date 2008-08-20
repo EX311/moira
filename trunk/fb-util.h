@@ -6,6 +6,7 @@
 
 
 #include <linux/fb.h> /* for fb_var_screeninfo, FBIOGET_VSCREENINFO */
+#include "font.h"
 
 #define FBDEVFILE "/dev/fb0"
 
@@ -51,6 +52,10 @@ extern void buf_pixel(int x, int y, struct color color); // color의 생상을 �
 
 extern struct myfb_info* myfb_open (void);
 extern void myfb_close(void);
+
+void put_char(int, int, int, struct color);
+void put_string(int, int, char *, struct color);
+void put_string_center(int, int, char *, struct color);
 
 // add functions for BMP
 struct bmphandle_s;

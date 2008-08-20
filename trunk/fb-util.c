@@ -365,6 +365,30 @@ struct myfb_info* myfb_open (void)
  * Under this line Added by amoolove
  */
 
+void put_char(int x, int y, int c, struct color color)
+{
+	int i,j,bits;
+	for (i = 0; i < font_vga_8x8.height; i++) {
+		bits = font_vga_8x8.data [font_vga_8x8.height * c + i];
+		for (j = 0; j < font_vga_8x8.width; j++, bits <<= 1)
+			if (bits & 0x80)
+				drow_pixel(x+j, y+i, color);
+	}
+}
+
+void put_string(int x, int y, char *s, struct color color)
+{
+	int i;
+	for (i = 0; *s; i++, x += font_vga_8x8.width, s++)
+		put_char (x, y, *s, color);
+}
+
+void put_string_center(int x, int y, char *s, struct color color)
+{
+	size_t sl = strlen (s);
+	put_string (x - (sl / 2) * font_vga_8x8.width, y - font_vga_8x8.height / 2, s, color);
+}
+
 void myfb_close(void)
 {
 	munmap(myfb->fb, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
