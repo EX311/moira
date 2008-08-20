@@ -13,16 +13,6 @@
 
 #include "oo.h"
 
-#define DEBUG 0
-
-/*
- *
-#if DEBUG
-printf(" message \n");
-#endif
-
-*/
-
 struct myfb_info *myfb;
 unsigned short *vfb_list[VFB_MAX];
 unsigned short * fb_mmap_temp;  // 더블 버퍼링 (myfb->fb의 임시 temp 변수)

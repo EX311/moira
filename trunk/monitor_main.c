@@ -46,6 +46,7 @@ void put_monitor(void)
 
 void show_grid(void)
 {
+	put_monitor();
 	drow_line(myfb->fbvar.xres/2, myfb->fbvar.yres/2-YRES, myfb->fbvar.xres/2, myfb->fbvar.yres/2+YRES, white);
 	drow_line(myfb->fbvar.xres/2-XRES, myfb->fbvar.yres/2, myfb->fbvar.xres/2+XRES, myfb->fbvar.yres/2, white);
 	drow_rect(myfb->fbvar.xres/2-XRES, myfb->fbvar.yres/2-YRES, myfb->fbvar.xres/2+XRES, myfb->fbvar.yres/2+YRES, white);
@@ -72,7 +73,6 @@ int main(int argc, char *argv[])
 		exit(1);
 /* initialize */
 	clear_screen();
-	put_monitor();
 	show_grid();
 	
 /* main process */
