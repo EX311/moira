@@ -21,7 +21,8 @@ static void sig(int sig)
 {
 	fflush(stderr);
 	printf("Quit - Sig #%d caught\n", sig);
-	exit(2);
+	fflush(stdout);
+	exit(1);
 }
 
 int main(int argc, char *argv[])
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
 	printf(" *** server for theMeal ***\n\n");
 #endif
+	printf("theMeal: oo_server started!\n");
 	
 /* initialize */
 	myfb = myfb_open();
@@ -53,7 +55,6 @@ int main(int argc, char *argv[])
 		exit(1);
 
 	buff = (unsigned short *)malloc(myfb->fbfix.smem_len);
-	printf("theMeal: oo_server started!\n");
 	
 /* main process */
 	while (1) {
