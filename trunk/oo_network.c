@@ -137,7 +137,8 @@ struct oo_i_data *input_recv(int sock, char *buff)
 int fb_send(int sock, unsigned short *data, int size)
 {
 	int ret;
-	ret = write(sock, data, size);
+//	ret = write(sock, data, size);
+	ret = send(sock, data, size, MSG_DONTWAIT);
 	return ret;
 }
 /* with socket fd, buffer

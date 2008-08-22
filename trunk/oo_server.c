@@ -11,6 +11,8 @@
 #include <signal.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <linux/fb.h>
 
 #include "oo.h"
@@ -65,7 +67,7 @@ int main(int argc, char *argv[])
 		count = 0;
 		offset = 0;
 
-		while ( (ret = read(clnt_sock, buff+offset, BUFSIZ)) != 0) {
+		while ( (ret = recv(clnt_sock, buff+offset, BUFSIZ, 0)) != 0) {
 			count += ret;
 			offset += ret/2;
 #ifdef DEBUG

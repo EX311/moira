@@ -39,9 +39,9 @@ static void sig(int sig)
 
 void put_monitor(void)
 {
-	put_string (myfb->fbvar.xres/4, myfb->fbvar.yres/4-25, ">> theMeal Project Monitor program", 1);
-	put_string (myfb->fbvar.xres/4, myfb->fbvar.yres/4-10, ">> Code by amoolove", 2);
-	put_string (myfb->fbvar.xres/2+150 , myfb->fbvar.yres/2 + myfb->fbvar.yres/4, "theMeal Project 2008", 3);
+	put_string (myfb->fbvar.xres/4, myfb->fbvar.yres/4-25, ">> theMeal Project Monitor program", white);
+	put_string (myfb->fbvar.xres/4, myfb->fbvar.yres/4-10, ">> Code by amoolove", white);
+	put_string (myfb->fbvar.xres/2+150 , myfb->fbvar.yres/2 + myfb->fbvar.yres/4, "theMeal Project 2008", white);
 }
 
 void show_grid(void)

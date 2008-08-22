@@ -292,7 +292,6 @@ void buf_pixel(int x, int y, struct color color)
 
 void show_vfb(unsigned short* vfb)
 {
-	//memset( , 0, myfb->fbfix.smem_len);
 	memcpy( (void*)myfb->fb,vfb, myfb->fbfix.smem_len);
 	memset( vfb, 0, myfb->fbfix.smem_len);
 }
