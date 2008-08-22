@@ -12,6 +12,7 @@
 #include <string.h> /*for memcpy */
 
 #include "oo.h"
+//#include "fb-util.h"
 
 struct myfb_info *myfb;
 unsigned short *vfb_list[VFB_MAX];
@@ -287,6 +288,20 @@ void buf_pixel(int x, int y, struct color color)
 
 	if(offset > -1 && offset <= myfb->fbfix.smem_len ) {
 		*(vfb_list[location]+offset) = pixel ;
+	}
+}
+
+void buf_rect(int x1, int y1, int x2, int y2, struct color color)
+{
+	int i, j;
+	int offset;
+
+	for(i = y1;i <= y2;i++)
+	{
+		offset = i * myfb->fbvar.xres;
+
+		for(j = x1;j <= x2;j++)
+			buf_pixel(j, offset, color);
 	}
 }
 
