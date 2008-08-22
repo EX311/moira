@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
 		while ( (ret = read(clnt_sock, buff+offset, BUFSIZ)) != 0) {
 			count += ret;
-			offset += ret/2;
+			offset += ret/sizeof(unsigned short);
 #ifdef DEBUG
 			printf("READ: #%d Total: #%d\n", ret, count);
 #endif
