@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 		count = 0;
 		offset = 0;
 
-		while ( (ret = recv(clnt_sock, buff+offset, BUFSIZ, 0)) != 0) {
+		while ( (ret = read(clnt_sock, buff+offset, BUFSIZ)) != 0) {
 			count += ret;
 			offset += ret/2;
 #ifdef DEBUG
@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
 			if (count == myfb->fbfix.smem_len) {
 				show_vfb(buff);
 				count = 0;
+				offset = 0;
 			}
 		}
 		close(clnt_sock);
