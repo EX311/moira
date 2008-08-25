@@ -249,6 +249,7 @@ void  free_vfb_buf(int n)
  * each vfb data is vfb_list[location]
  *
  */
+
 void buf_pixel(int x, int y, struct color color)
 {
 	unsigned short pixel;
@@ -257,27 +258,23 @@ void buf_pixel(int x, int y, struct color color)
 
 	if ( -1  < x && x <320 && -1< y  && y<240)
 	{
-		location = 0;
-		
+		location = 0;		
 	}
-	if ( 319 < x && x <640 && -1< y  && y<240)
+	else if ( 319 < x && x <640 && -1< y  && y<240)
 	{
 		location = 1;
 		x-=320; 
-	}
-	
-	if ( -1 < x && x <320 && 239< y  && y<480)
+	}	
+	else if ( -1 < x && x <320 && 239< y  && y<480)
 	{
 		location = 2;
 		y-=240;
-	}
-	
-	if ( 319 < x && x <640 && 239< y  && y<480)
+	}	
+	else if ( 319 < x && x <640 && 239< y  && y<480)
 	{
 		location = 3;
 		x-=320;
-		y-=240;
-		
+		y-=240;		
 	}
 
 	if (x >= 640 || y >= 480)
@@ -291,6 +288,52 @@ void buf_pixel(int x, int y, struct color color)
 	}
 }
 
+void buf_test_rect(int x1, int y1, int x2, int y2, struct color color)
+{
+	int i, j, x, y;
+	unsigned short pixel;
+	int offset;
+	int location;
+
+	for(i = y1;i <= y2;i++)
+	{
+		for(j = x1;j <= x2;j++)
+		{
+			x = j; y = i;
+			if ( -1  < x && x <320 && -1< y  && y<240)
+			{
+				location = 0;		
+			}
+			else if ( 319 < x && x <640 && -1< y  && y<240)
+			{
+				location = 1;
+				x-=320; 
+			}	
+			else if ( -1 < x && x <320 && 239< y  && y<480)
+			{
+				location = 2;
+				y-=240;
+			}	
+			else if ( 319 < x && x <640 && 239< y  && y<480)
+			{
+				location = 3;
+				x-=320;
+				y-=240;		
+			}
+
+			if (x >= 640 || y >= 480)
+				return;
+
+			offset =y * myfb->fbvar.xres + x;
+			pixel = makepixel(color);
+
+			if(offset > -1 && offset <= myfb->fbfix.smem_len ) {
+				*(vfb_list[location]+offset) = pixel ;
+			}
+		}
+	}
+}
+
 void buf_rect(int x1, int y1, int x2, int y2, struct color color)
 {
 	int i, j;
@@ -298,12 +341,11 @@ void buf_rect(int x1, int y1, int x2, int y2, struct color color)
 
 	for(i = y1;i <= y2;i++)
 	{
-		offset = i * myfb->fbvar.xres;
-
 		for(j = x1;j <= x2;j++)
-			buf_pixel(j, offset, color);
+			buf_pixel(j, i, color);
 	}
 }
+
 
 void show_vfb(unsigned short* vfb)
 {
@@ -400,7 +442,7 @@ void myfb_close(void)
 	free(myfb);
 }
 
-void buf_bmp(bmphandle_t bh, int x, int y)
+void buf_bmp(bmphandle_t bh, int x, int y)	// buffer use inner rect
 {
 	int i, j;
 	struct color pixel;

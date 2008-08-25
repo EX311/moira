@@ -50,6 +50,7 @@ extern void free_vfb_buf(int n);
 extern void show_vfb(unsigned short* vfb); // vfb의 data를 FB에 출력
 extern void buf_pixel(int x, int y, struct color color); // color의 생상을 가진 점을 각 사분면의 맞게 set_vfb_buf() 에서 받은 공간에 저장
 
+extern void buf_show_rect(int x1, int y1, int x2, int y2, struct color color);
 extern void buf_rect(int x1, int y1, int x2, int y2, struct color color);
 
 extern struct myfb_info* myfb_open (void);
