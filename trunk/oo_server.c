@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	signal(SIGTERM, sig);
 
 #ifdef DEBUG
-	printf(" *** server for theMeal ***\n\n");
+	fprintf(stderr, " *** server for theMeal ***\n\n");
 #endif
 	printf("theMeal: oo_server started!\n");
 	
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 			count += ret;
 			offset += ret/sizeof(unsigned short);
 #ifdef DEBUG
-			printf("READ: #%d Total: #%d\n", ret, count);
+			fprintf(stderr, "READ: #%d Total: #%d\n", ret, count);
 #endif
 			if (count == myfb->fbfix.smem_len) {
 				show_vfb(buff);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 	myfb_close();
 	
 #ifdef DEBUG
-	printf("\n *** All done completely. ***\n");
+	fprintf(stderr, "\n *** All done completely. ***\n");
 #endif
 	exit(0);
 	return 0;
