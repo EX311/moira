@@ -23,7 +23,7 @@ struct oo_fb_data {
 	unsigned short pix_data;
 }; /* Data for monitor */
 
-extern int ip2port(char *);
+extern int ip2port(char *, int);
 extern int tcp_server_listen(int, int);
 extern int tcp_server_accept(int);
 extern int tcp_client_connect(char *, int);

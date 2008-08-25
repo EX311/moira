@@ -22,7 +22,7 @@ extern struct myfb_info *myfb;
 
 int main(int argc, char *argv[])
 {
-	int i, ret;
+	int i, j, ret;
 	int sock[VFB_MAX];
 	char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.30", "192.168.77.55", "192.168.77.77"};
 	struct oo_fb_data *buf_monitor;
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	}
 
 	for (i=1; i<VFB_MAX; i++) {
-		sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i]));
+		sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
 		if (sock[i] < 0) 
 			fprintf(stderr, "%s connect error\n", ipaddr[i]);
 	}
@@ -56,11 +56,11 @@ int main(int argc, char *argv[])
 	buf_monitor = alloc_net_buf(sizeof(struct oo_fb_data)*bmp_width(bh)*bmp_height(bh)*16/8);
 	/* main loop */
 	buf_bmp(bh, 0, 0);
-
-	for (i=1; i<VFB_MAX; i++)
-		if (sock[i] > 0)
+	for (i=1; i<VFB_MAX; i++) {
+		if (sock[i] > 0) {
 			fb_send(sock[i], vfb_list[i], myfb->fbfix.smem_len);
-
+		}
+	}
 	show_vfb(vfb_list[0]);
 	monitor_bmp(bh, 0, 0, buf_monitor);
 	ret = write(sock[0], buf_monitor, sizeof(struct oo_fb_data)*bmp_width(bh)*bmp_height(bh)*16/8);

@@ -27,9 +27,9 @@ int error_handling(char *message)
 /*
  * from string of ip to integer port NO.
  */
-int ip2port(char *ip)
+int ip2port(char *ip, int startp)
 {
-	return ( (inet_addr(ip)) >> 24) + 8000;
+	return ( (inet_addr(ip)) >> 24) + startp;
 }
 /*
  * TCP server functions
