@@ -1,7 +1,7 @@
 /*
  * only for cam testing
- * compile : arm-linux-gcc fb-util.c oo_network.c bmplib.c font_8x8.c vidio_call.c -o vidio_call
- * run : /.vidio_call [ip]
+ * compile : arm-linux-gcc fb-util.c oo_network.c bmplib.c font_8x8.c vidio_call.c -o video_call
+ * run : /.video_call [ip]
  */
 
 #include <stdio.h>
