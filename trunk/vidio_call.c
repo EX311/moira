@@ -1,7 +1,7 @@
 /*
  * only for cam testing
- * compile : arm-linux-gcc fb-util.c oo_network.c bmplib.c font_8x8.c cam_test.c -o test
- * run : /.test
+ * compile : arm-linux-gcc fb-util.c oo_network.c bmplib.c font_8x8.c vidio_call.c -o vidio_call
+ * run : /.vidio_call [ip]
  */
 
 #include <stdio.h>
@@ -39,7 +39,7 @@ static inline int cam_init(void)
 
 
 
-int main(void)
+int main( int arvc, char** argv)
 {
 
 	int cam_fd ;
@@ -52,25 +52,21 @@ int main(void)
 	////////////////////////////////////////////////////////
 	
 	int i, ret;
-	int sock[VFB_MAX];
-	char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.20", "192.168.77.55", "192.168.77.77"};
+	int sock;
+	char *ipaddr = argv[1];
 			
 	myfb = myfb_open();
 	
-	sock[0] = tcp_client_connect(ipaddr[0], 8192);
+	sock = tcp_client_connect(ipaddr, 8192);
 
-	if (sock[0] < 0) {
-		perror(ipaddr[0]);
+	if (sock < 0) {
+		perror(ipaddr);
 	}
 
+	sock = tcp_client_connect(ipaddr, ip2port(ipaddr));
 	
-	
-	for (i=1; i<VFB_MAX; i++) {
-		sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i]));
-		if (sock[i] < 0) 
-			fprintf(stderr, "%s connect error\n", ipaddr[i]);
-	}
-	
+	if (sock < 0) 
+		fprintf(stderr, "%s connect error\n", ipaddr);
 	
 	
 	set_vfb_buf(VFB_MAX);
@@ -101,15 +97,15 @@ int main(void)
 		while(1)
 		{
 			count = read(cam_fd, (unsigned char*)vfb_list[0],320*240*2);
-		
-			for (i=1; i<VFB_MAX; i++)
-				if (sock[i] > 0)
+			usleep(220000);
+		//	for (i=1; i<VFB_MAX; i++)
+				if (sock > 0)
 				{
-				fb_send(sock[i], vfb_list[0], myfb->fbfix.smem_len);
+				fb_send(sock, vfb_list[0], myfb->fbfix.smem_len);
 				//fb_send(sock[i], vfb_list[i], myfb->fbfix.smem_len);
 				}
 
-			show_vfb(vfb_list[0]);
+		//	show_vfb(vfb_list[0]);
 		
 		}
 //	}//end if
