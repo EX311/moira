@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
 				offset = 0;
 			}
 		}
+		clear_screen();
 		close(clnt_sock);
 	}
 	
