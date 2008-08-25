@@ -109,10 +109,11 @@ void  dot( int x, int y, struct color *color) // write color pixel
 {
 	unsigned short *ptr;
 	
-	if ( 0 <= x && 0 <= y && x < myfb->fbvar.xres && y < myfb->fbvar.yres )
+	if ( 0 <= x && 0 <= y && x < myfb->fbvar.xres*2 && y < myfb->fbvar.yres*2 )
 	{
-		ptr   = fb_mmap_temp + myfb->fbvar.xres * y + x;  // offset
-		*ptr  = makepixel(*color); // 임시 mmap변수 fb_mmap_temp에 픽셀을 write
+		//ptr   = fb_mmap_temp + myfb->fbvar.xres * y + x;  // offset
+		//*ptr  = makepixel(*color); // 임시 mmap변수 fb_mmap_temp에 픽셀을 write
+		buf_pixel(x, y, *color);
 	}
 }
  
@@ -156,8 +157,8 @@ void  drow_ploat_circle( int x_center, int y_center, int radius, struct color co
 	int      y_coor;
 	int      p_value;
 
-	fb_mmap_temp = (unsigned short *)malloc(myfb->fbvar.xres*myfb->fbvar.yres*2); // 더블버퍼링 임시변수에 screen size 할당
-  memset(fb_mmap_temp, 0, myfb->fbvar.xres*myfb->fbvar.yres*2); // 더블버퍼 클리어
+	//fb_mmap_temp = (unsigned short *)malloc(myfb->fbvar.xres*myfb->fbvar.yres*2); // 더블버퍼링 임시변수에 screen size 할당
+  //memset(fb_mmap_temp, 0, myfb->fbvar.xres*myfb->fbvar.yres*2); // 더블버퍼 클리어
 
 	x_coor   = 0;
 	y_coor   = radius;
@@ -179,8 +180,8 @@ void  drow_ploat_circle( int x_center, int y_center, int radius, struct color co
 	if ( x_coor == y_coor)
 		ploat_circle( x_center, y_center, x_coor, y_coor, &color);
 	
-	memcpy(myfb->fb, fb_mmap_temp, myfb->fbvar.xres*myfb->fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
-	free(fb_mmap_temp);
+	//memcpy(myfb->fb, fb_mmap_temp, myfb->fbvar.xres*myfb->fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
+	//free(fb_mmap_temp);
 }
 
 void  drow_inner_circle( int x_center, int y_center, int radius, struct color color)  // 꽉찬원 draw (x, y, radius, color)
@@ -189,8 +190,8 @@ void  drow_inner_circle( int x_center, int y_center, int radius, struct color co
 	int      y_coor;
 	int      p_value;
 
-	fb_mmap_temp = (unsigned short *)malloc(myfb->fbvar.xres*myfb->fbvar.yres*2); // 더블버퍼링 임시변수에 screen size 할당
-  memset(fb_mmap_temp, 0, myfb->fbvar.xres*myfb->fbvar.yres*2); // 더블버퍼 클리어
+	//fb_mmap_temp = (unsigned short *)malloc(myfb->fbvar.xres*myfb->fbvar.yres*2); // 더블버퍼링 임시변수에 screen size 할당
+  //memset(fb_mmap_temp, 0, myfb->fbvar.xres*myfb->fbvar.yres*2); // 더블버퍼 클리어
 
 	x_coor   = 0;
 	y_coor   = radius;
@@ -212,8 +213,8 @@ void  drow_inner_circle( int x_center, int y_center, int radius, struct color co
 	if ( x_coor == y_coor)
 		inner_circle( x_center, y_center, x_coor, y_coor, &color);
 	
-	memcpy(myfb->fb, fb_mmap_temp, myfb->fbvar.xres*myfb->fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
-	free(fb_mmap_temp);
+	//memcpy(myfb->fb, fb_mmap_temp, myfb->fbvar.xres*myfb->fbvar.yres*2);  // mmap에 memory copy (더블 버퍼링)
+	//free(fb_mmap_temp);
 }
 
 
