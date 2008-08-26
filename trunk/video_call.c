@@ -75,10 +75,6 @@ int main( int arvc, char** argv)
 	camif_cfg.dst_x = 320 ;
 	camif_cfg.dst_y = 240;
 	
-	
-//	camif_cfg.dst_x = 640 ;
-//	camif_cfg.dst_y = 480;
-
 	camif_cfg.bpp = 16;
 	camif_cfg.flip = 0 ;
 
@@ -92,24 +88,16 @@ int main( int arvc, char** argv)
 	write(cam_fd,"O",2); // cam start code 
 	printf("cam start\n");
 
-//	if((pid = fork()) >0)
-//	{
-		while(1)
-		{
-			count = read(cam_fd, (unsigned char*)vfb_list[0],320*240*2);
-			usleep(220000);
-		//	for (i=1; i<VFB_MAX; i++)
-				if (sock > 0)
-				{
-				fb_send(sock, vfb_list[0], myfb->fbfix.smem_len);
-				//fb_send(sock[i], vfb_list[i], myfb->fbfix.smem_len);
-				}
+	while(1)
+	{
+		count = read(cam_fd, (unsigned char*)vfb_list[0],320*240*2);
+		usleep(300000);
+			if (sock > 0)
+			fb_send(sock, vfb_list[0], myfb->fbfix.smem_len);
 
 		//	show_vfb(vfb_list[0]);
-		
 		}
-//	}//end if
-
+	
 	/* Stop Camera */
 	write(cam_fd,"X",2);
 	
