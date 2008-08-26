@@ -1,5 +1,5 @@
 /* 
- * theMeal Server Program
+ * theMeal TouchScreen Server Program
  * code by amoolove
  */
 
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	while (1) {
 		int pid, status;
 		char ts_ack[1];
-		struct ts_sample samp;
+		struct ts_sample samp, v_samp;
 		clnt_sock = tcp_server_accept(serv_sock);
 		if (clnt_sock < 0)
 			exit(1);
@@ -100,6 +100,8 @@ int main(int argc, char *argv[])
 				if (ret != 1)
 					continue;
 
+//				v_samp = phy2vir_pos(samp, mylocation);
+//				ret = write(clnt_sock, &v_samp, sizeof(struct ts_sample));
 				ret = write(clnt_sock, &samp, sizeof(struct ts_sample));
 #ifdef DEBUG
 				fprintf(stderr, "%ld.%06ld: %6d %6d %6d\n", samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
