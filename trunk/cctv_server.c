@@ -125,11 +125,16 @@ int main(int argc, char *argv[])
 		count = 0;
 		offset = 0;
 
-		while(1)
+		while( (ret = read(cam_fd, (unsigned char*)vfb_list[0],myfb->fbfix.smem_len) != 0))
 		{
-			count = read(cam_fd, (unsigned char*)vfb_list[0],myfb->fbfix.smem_len);
-			usleep(300000);
-			fb_send(clnt_sock, vfb_list[0], myfb->fbfix.smem_len);
+			count += ret;
+		//	usleep(300000);
+			if(count == myfb->fbfix.smem_len)
+			{
+
+				fb_send(clnt_sock, vfb_list[0], myfb->fbfix.smem_len);
+				count = 0 ;
+			}
 
 			//	show_vfb(vfb_list[0]);
 		}

@@ -38,7 +38,7 @@ void change_view_handler(int n)
 int main( int arvc, char** argv)
 {
 
-	int count ;
+	int count = 0 ;
 	pid_t child_id;
 	int key_buf;
 
@@ -74,11 +74,17 @@ int main( int arvc, char** argv)
 		fprintf(stderr, "%s connect error\n", ipaddr[cam_id]);
 	
 
-	while(1)
+	while(	(ret = read(sock,(unsigned char*)vfb_list[cam_id],320*240*2)) != 0)
 	{
-		count = read(sock,(unsigned char*)vfb_list[cam_id],320*240*2);
-		usleep(10000);
-		show_vfb(vfb_list[cam_id]);
+
+		count += ret;
+
+		//usleep(10000);
+		if( count == myfb->fbfix.smem_len)
+		{
+			show_vfb(vfb_list[cam_id]);
+			count = 0;
+		}
 
 		if(event) {
 			event = 0;
