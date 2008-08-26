@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 		count = 0;
 		offset = 0;
 
-		while( (ret = read(cam_fd, (unsigned char*)vfb_list[0],myfb->fbfix.smem_len) != 0))
+		while( ( (ret = read(cam_fd, (unsigned char*)vfb_list[0],myfb->fbfix.smem_len) ) != 0))
 		{
 			count += ret;
 
