@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
 		printf("USAGE : %s myip\n", argv[0]);
 		exit(1);
 	}
+
 	myip = argv[1];
 
 	signal(SIGSEGV, sig);
@@ -50,20 +51,20 @@ int main(int argc, char *argv[])
 	printf("theMeal: oo_server started!\n");
 	
 /* initialize */
+
 	myfb = myfb_open();
 
 	serv_sock = tcp_server_listen(ip2port(myip, 8000), 2);
 	if (serv_sock < 0)
 		exit(1);
-
+		
 	buff = (unsigned short *)malloc(myfb->fbfix.smem_len);
-	
 /* main process */
 	while (1) {
 		clnt_sock = tcp_server_accept(serv_sock);
 		if (clnt_sock < 0)
 			exit(1);
-
+		
 		count = 0;
 		offset = 0;
 
