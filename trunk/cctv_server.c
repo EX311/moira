@@ -28,7 +28,6 @@
 
 extern struct myfb_info *myfb;
 
-
 static camif_param_t camif_cfg;
 struct myfb_info* myfb ;
 
@@ -72,12 +71,10 @@ int main(int argc, char *argv[])
 {
 	int ret, count, offset;
 	int serv_sock, clnt_sock;
-	unsigned short *buff;
+	//unsigned short *buff;
 	char *myip;
 
 	int cam_fd ;
-	
-	
 	
 	if (argc < 2) {
 		printf("USAGE : %s myip\n", argv[0]);
@@ -110,30 +107,30 @@ int main(int argc, char *argv[])
 	write(cam_fd,"O",2); // cam start code 
 
 	serv_sock = tcp_server_listen(ip2port(myip, 8002), 2);
+	
 	if (serv_sock < 0)
 		exit(1);
 
-	buff = (unsigned short *)malloc(2);
+//	buff = (unsigned short *)malloc(2);
 	
 /* main process */
 	while (1) {
 		clnt_sock = tcp_server_accept(serv_sock);
 		if (clnt_sock < 0)
-			exit(1);
+		{
+			close(clnt_sock);
+			sleep(1);
+		}
 
 		count = 0;
 		offset = 0;
 
 		while(1)
 		{
-			count = read(cam_fd, (unsigned char*)vfb_list[0],320*240*2);
+			count = read(cam_fd, (unsigned char*)vfb_list[0],myfb->fbfix.smem_len);
 			usleep(300000);
 			fb_send(clnt_sock, vfb_list[0], myfb->fbfix.smem_len);
 
-			read(clnt_sock, buff,2);
-
-			//if ( *buff == 0xff)
-			//	break;
 			//	show_vfb(vfb_list[0]);
 		}
 		close(clnt_sock);

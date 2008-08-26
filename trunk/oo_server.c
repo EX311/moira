@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
 		
 	buff = (unsigned short *)malloc(myfb->fbfix.smem_len);
 /* main process */
+
 	while (1) {
 		clnt_sock = tcp_server_accept(serv_sock);
 		if (clnt_sock < 0)
