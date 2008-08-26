@@ -78,11 +78,13 @@ int main( int arvc, char** argv)
 	{
 
 		count += ret;
+		printf(" debug: count is %d \n",count);
 
 		//usleep(10000);
 		if( count == myfb->fbfix.smem_len)
 		{
 			show_vfb(vfb_list[cam_id]);
+			printf(" show \n");
 			count = 0;
 		}
 
