@@ -46,7 +46,7 @@ int main( int arvc, char** argv)
 	int i, ret;
 	int sock;
 	
-	cam_id = 1 ;
+	cam_id = atoi(argv[1]);
 
 	myfb = myfb_open();
 	set_vfb_buf(VFB_MAX);
@@ -78,19 +78,19 @@ int main( int arvc, char** argv)
 	while(1)
 	{
 		//ret = read(sock,(unsigned char*)vfb_list[cam_id] + offset, myfb->fbfix.smem_len);
-		ret = read(sock,(unsigned char*)vfb_list[cam_id] , myfb->fbfix.smem_len);
-		usleep(10000);
+		ret = read(sock,(unsigned char*)vfb_list[cam_id] + count , myfb->fbfix.smem_len);
 		//ret = read(sock,(unsigned char*)vfb_list[cam_id] + offset, BUFSIZ);
-		printf(" 	debug :: ret is %d \n",ret);
+
 		count += ret;
 		//count += ret/sizeof(unsigned short);
-		//offset += ret/sizeof(unsigned short);
+		//offset += ret;
 
+		printf(" 	debug :: ret is %d \n",count);
 
 	//	usleep(10000);
 		if( count == myfb->fbfix.smem_len)
 		{
-			printf("	 debug: call vfb_show \n ");
+			printf("		 debug: call vfb_show \n ");
 			show_vfb(vfb_list[cam_id]);
 			count = 0;
 		}
