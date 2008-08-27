@@ -39,6 +39,7 @@ int main( int arvc, char** argv)
 {
 
 	int count = 0 ;
+	int offset = 0 ;
 	pid_t child_id;
 	int key_buf;
 
@@ -74,15 +75,17 @@ int main( int arvc, char** argv)
 		fprintf(stderr, "%s connect error\n", ipaddr[cam_id]);
 	
 
-	while(	(ret = read(sock,(unsigned char*)vfb_list[cam_id],320*240*2)) != 0)
+	while(	(ret = read(sock,(unsigned char*)vfb_list[cam_id] + offset, myfb->fbfix.smem_len)) != 0)
 	{
-
+		printf(" 	debug :: ret is %d \n",ret);
 		count += ret;
-		printf(" debug: count is %d \n",count);
+		offset += ret/sizeof(unsigned short);
+
 
 		//usleep(10000);
 		if( count == myfb->fbfix.smem_len)
 		{
+			printf(" debug: call vfb_show  ");
 			show_vfb(vfb_list[cam_id]);
 			printf(" show \n");
 			count = 0;
@@ -94,11 +97,12 @@ int main( int arvc, char** argv)
 			break; 
 		}
 	}
-	close(sock);
+
 	
 	}
 
 
+	close(sock);
 	myfb_close();
 	free_vfb_buf(VFB_MAX);
 	return 0;

@@ -141,8 +141,9 @@ int main(int argc, char *argv[])
 
 			//	show_vfb(vfb_list[0]);
 		}
-		close(clnt_sock);
 	}
+	
+	close(clnt_sock);
 	
 	/* Stop Camera */
 	write(cam_fd,"X",2);
