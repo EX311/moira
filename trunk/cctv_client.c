@@ -75,27 +75,32 @@ int main( int arvc, char** argv)
 		fprintf(stderr, "%s connect error\n", ipaddr[cam_id]);
 	
 
-	while(	(ret = read(sock,(unsigned char*)vfb_list[cam_id] + offset, myfb->fbfix.smem_len)) != 0)
+	while(1)
 	{
+		//ret = read(sock,(unsigned char*)vfb_list[cam_id] + offset, myfb->fbfix.smem_len);
+		ret = read(sock,(unsigned char*)vfb_list[cam_id] , myfb->fbfix.smem_len);
+		usleep(10000);
+		//ret = read(sock,(unsigned char*)vfb_list[cam_id] + offset, BUFSIZ);
 		printf(" 	debug :: ret is %d \n",ret);
 		count += ret;
-		offset += ret/sizeof(unsigned short);
+		//count += ret/sizeof(unsigned short);
+		//offset += ret/sizeof(unsigned short);
 
 
-		//usleep(10000);
+	//	usleep(10000);
 		if( count == myfb->fbfix.smem_len)
 		{
-			printf(" debug: call vfb_show  ");
+			printf("	 debug: call vfb_show \n ");
 			show_vfb(vfb_list[cam_id]);
-			printf(" show \n");
 			count = 0;
 		}
-
+/*
 		if(event) {
 			event = 0;
 			cam_id = (cam_id + 1)%2;
 			break; 
-		}
+			}
+*/		
 	}
 
 	

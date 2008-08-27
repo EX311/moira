@@ -126,9 +126,12 @@ int main(int argc, char *argv[])
 		count = 0;
 		offset = 0;
 
-		while( ( (ret = read(cam_fd, (unsigned char*)vfb_list[0],myfb->fbfix.smem_len) ) != 0))
+		while(1)
 		{
+
+			ret = read(cam_fd, (unsigned char*)vfb_list[0],myfb->fbfix.smem_len) ;
 			count += ret;
+
 
 			printf(" debug :: count is %d \n", count);
 		//	usleep(300000);
@@ -138,9 +141,11 @@ int main(int argc, char *argv[])
 				printf(" debug :: send data  \n" );
 				fb_send(clnt_sock, vfb_list[0], myfb->fbfix.smem_len);
 				count = 0 ;
+			
+			//	show_vfb(vfb_list[0]);
 			}
 
-			//	show_vfb(vfb_list[0]);
+
 		}
 	}
 	
