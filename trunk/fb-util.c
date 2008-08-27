@@ -217,7 +217,6 @@ void  drow_inner_circle( int x_center, int y_center, int radius, struct color co
 	//free(fb_mmap_temp);
 }
 
-
 void set_vfb_buf(int n)
 {
 	
@@ -242,6 +241,14 @@ void  free_vfb_buf(int n)
 		if (vfb_list[i])
 			free(vfb_list[i]);
 	}
+}
+
+void clear_vfb_buf(int n)
+{
+	int i;
+
+	for (i=0; i<n; i++)
+		memset(vfb_list[i], 0, myfb->fbfix.smem_len);
 }
 
 /*

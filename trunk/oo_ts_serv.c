@@ -108,6 +108,7 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "To #%d write: %d\n", clnt_sock, ret);
 #endif
 			} while ( (ret = read(clnt_sock, ts_ack, 1)) && (ts_ack[0] == '1'));
+			shutdown(clnt_sock, SHUT_WR);
 			close(clnt_sock);
 #ifdef DEBUG
 			fprintf(stderr, "\n *** child process is done\n");

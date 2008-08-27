@@ -47,6 +47,7 @@ extern void  drow_inner_circle( int x_center, int y_center, int radius, struct c
 
 extern void set_vfb_buf(int n); // n개의 vfb와 같은 크기의 메모리 공간을 동적 할당 각 메모리 포인터는  vfb_list[n]에 저장
 extern void free_vfb_buf(int n);
+extern void clear_vfb_buf(int n);
 extern void show_vfb(unsigned short* vfb); // vfb의 data를 FB에 출력
 extern void buf_pixel(int x, int y, struct color color); // color의 생상을 가진 점을 각 사분면의 맞게 set_vfb_buf() 에서 받은 공간에 저장
 
