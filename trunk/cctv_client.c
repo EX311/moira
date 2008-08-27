@@ -46,7 +46,7 @@ int main( int arvc, char** argv)
 	int i, ret;
 	int sock;
 	
-	cam_id = 3 ;
+	cam_id = 1 ;
 
 	myfb = myfb_open();
 	set_vfb_buf(VFB_MAX);
