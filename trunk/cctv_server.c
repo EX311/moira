@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <linux/fb.h>
 
+
 #include "oo.h"
 
 #include "/home/amon/work/source/rebis-2.6/drivers/media/video/userapp.h" // linux source tree for rebis
@@ -25,6 +26,8 @@
 #define CODEC_NAME  "/dev/preview"
 #define FB_NAME    "/dev/fb0" 
 #define TTY_NAME   "/dev/ttyS0" 
+
+#define DEBUG
 
 extern struct myfb_info *myfb;
 
@@ -116,40 +119,64 @@ int main(int argc, char *argv[])
 /* main process */
 	while (1) 
 	{
+		pid_t pid ;
+		int status;
+		char ack;
+		int ret_ack;
+
 		clnt_sock = tcp_server_accept(serv_sock);
 		if (clnt_sock < 0)
 		{
 			close(clnt_sock);
-			sleep(1);
+			continue;
 		}
 
 		count = 0;
 		offset = 0;
 
-		while(1)
+		pid = fork();
+		
+		if (pid >0)
 		{
+			close(clnt_sock);
+                       	wait(&status);
+			continue;
+		}
+		else
+		{
+			do
+			{	
+				ret = read(cam_fd, (unsigned char*)vfb_list[0],myfb->fbfix.smem_len) ;
+				count += ret;
 
-			ret = read(cam_fd, (unsigned char*)vfb_list[0],myfb->fbfix.smem_len) ;
-			count += ret;
-
-
+#ifdef DEBUG
 			printf(" debug :: count is %d \n", count);
-		//	usleep(300000);
-			if(count == myfb->fbfix.smem_len)
-			{
+#endif
+			
+				if(count == myfb->fbfix.smem_len)
+				{
 				
 				printf(" debug :: send data  \n" );
 				fb_send(clnt_sock, vfb_list[0], myfb->fbfix.smem_len);
 				count = 0 ;
-			
-			//	show_vfb(vfb_list[0]);
-			}
+				//	show_vfb(vfb_list[0]);
+				}
+				
+				//setsockopt(clnt_sock,SOL_TCP, SO_NODELAY,0,0);
+/*
+				ret_ack = read(clnt_sock, &ack,1);	
+				if( ack == '1')
+				{
+					break;
+				}
+*/
+			}while(1);
 
-
-		}
+			close(clnt_sock);
+			exit(0);
+		}//end esle
 	}
-	
-	close(clnt_sock);
+
 	
 	/* Stop Camera */
 	write(cam_fd,"X",2);

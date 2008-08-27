@@ -43,7 +43,8 @@ int main( int arvc, char** argv)
 	pid_t child_id;
 	int key_buf;
 
-	int i, ret;
+	int i = 0;
+	int ret;
 	int sock;
 	
 	cam_id = atoi(argv[1]);
@@ -69,39 +70,41 @@ int main( int arvc, char** argv)
 	while(1)
 	{
 	
+
 	sock = tcp_client_connect(ipaddr[cam_id], ip2port(ipaddr[cam_id],8002));
 	
 	if (sock < 0) 
 		fprintf(stderr, "%s connect error\n", ipaddr[cam_id]);
 	
 
-	while(1)
-	{
-		//ret = read(sock,(unsigned char*)vfb_list[cam_id] + offset, myfb->fbfix.smem_len);
-		ret = read(sock,(unsigned char*)vfb_list[cam_id] + count , myfb->fbfix.smem_len);
-		//ret = read(sock,(unsigned char*)vfb_list[cam_id] + offset, BUFSIZ);
-
-		count += ret;
-		//count += ret/sizeof(unsigned short);
-		//offset += ret;
-
-		printf(" 	debug :: ret is %d \n",count);
-
-	//	usleep(10000);
-		if( count == myfb->fbfix.smem_len)
+		while(1)
 		{
+			ret = read(sock,(unsigned char*)vfb_list[cam_id] + count , myfb->fbfix.smem_len);
+	
+			count += ret;
+
+			printf(" 	debug :: ret is %d \n",count);
+		
+			if( count == myfb->fbfix.smem_len)
+			{
 			printf("		 debug: call vfb_show \n ");
 			show_vfb(vfb_list[cam_id]);
 			count = 0;
-		}
-/*
+			
+			}
+
+	
 		if(event) {
 			event = 0;
-			cam_id = (cam_id + 1)%2;
+			cam_id = (cam_id + 2)%4;
+	//		i =0;
+	//		close(sock);
 			break; 
+
 			}
-*/		
-	}
+	
+		
+		}
 
 	
 	}
