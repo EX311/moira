@@ -20,7 +20,8 @@ int x = 0;
 int y = 0;
 int ts_sock[VFB_MAX];
 struct color black = {0,0,0};
-char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.30", "192.168.77.55", "192.168.77.77"};
+//char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.30", "192.168.77.55", "192.168.77.77"};
+char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.20", "192.168.77.55", "192.168.77.77"};
 
 extern struct myfb_info *myfb;
 
@@ -61,14 +62,19 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "[MONITOR] %s connect error\n", ipaddr[0]);
 	}
 */
-	for (i=1; i<VFB_MAX; i++) {
+//	for (i=1; i<VFB_MAX; i++) {
+	for (i=1; i<2; i++) {
 		fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
 		if (fb_sock[i] < 0) 
 			fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
+		else
+			fprintf(stderr, "[FB] %s connect success!\n", ipaddr[i]);
 
 		ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
 		if (ts_sock[i] < 0) 
 			fprintf(stderr, "[TS] %s connect error\n", ipaddr[i]);
+		else
+			fprintf(stderr, "[TS] %s connect success!\n", ipaddr[i]);
 	}
 
 	bh = bmp_open(argv[1]);
@@ -91,7 +97,7 @@ int main(int argc, char *argv[])
 #endif
 	for (i=1; i<VFB_MAX; i++) {
 		if (ts_sock[i] > 0) {
-			ret = pthread_create(&ts_thread[i], NULL, ts_net_read, (void *)&i);
+			ret = pthread_create(&ts_thread[i], NULL, ts_net_read, (void *)&(ts_sock[i]));
 			if (ret != 0) {
 				fprintf(stderr, "thread create: %s\n", ipaddr[i]);
 				exit(1);
@@ -108,7 +114,7 @@ int main(int argc, char *argv[])
 		buf_bmp(bh, x, y);
 		for (i=1; i<VFB_MAX; i++) {
 			if (fb_sock[i] > 0) {
-				fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
+//				fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
 			}
 		}
 		show_vfb(vfb_list[0]);
@@ -165,11 +171,11 @@ int main(int argc, char *argv[])
 
 void *ts_net_read(void *arg)
 {
-	int ret, sock, location;
+	int ret, sock;
 	char tsbuff[sizeof(struct ts_sample)];
 	struct ts_sample samp;
 #ifdef DEBUG
-	fprintf(stderr, "%s started... \n", ipaddr[*(int *)arg]);
+	fprintf(stderr, "%d started... \n", *(int *)arg);
 #endif
 
 	ret = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
@@ -183,12 +189,11 @@ void *ts_net_read(void *arg)
 		exit(1);
 	}
 
-	location = *(int *)arg;
-	sock = ts_sock[location];
+	sock = *(int *)arg;
 	while ( (quit != 0) && (ret = read(sock, tsbuff, sizeof(struct ts_sample)))) {
 		memcpy(&samp, tsbuff, sizeof(struct ts_sample));
 #ifdef DEBUG
-		fprintf(stderr, "%s %ld.%06ld: %6d %6d %6d\n", ipaddr[location], samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
+		fprintf(stderr, "%d -> %ld.%06ld: %6d %6d %6d\n", sock, samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
 #endif
 
 		x = 320;

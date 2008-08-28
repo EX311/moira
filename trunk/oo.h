@@ -23,6 +23,11 @@ struct oo_fb_data {
 	unsigned short pix_data;
 }; /* Data for monitor */
 
+struct oo_button {
+	int x, y, w, h;
+	struct color color;
+};
+
 extern int ip2port(char *, int);
 extern int tcp_server_listen(int, int);
 extern int tcp_server_accept(int);
@@ -39,4 +44,7 @@ extern int free_net_buf(struct oo_fb_data *);
 extern void buf_bmp(bmphandle_t, int, int);
 extern void monitor_bmp(bmphandle_t, int, int, struct oo_fb_data *);
 extern void clear_screen(void);
+
+void draw_button(struct oo_button *button, char *string);
+int check_button(struct oo_button *button, struct ts_sample *samp);
 #endif /* _OO_H */
