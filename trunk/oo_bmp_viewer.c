@@ -15,13 +15,13 @@
 #include <linux/fb.h>  /* for fb_var_screeninfo, FBIOGET_VSCREENINFO */
 #include "oo.h"
 
-int quit = 1;
+int quit = 1, check = 0;
 int x = 0;
 int y = 0;
 int ts_sock[VFB_MAX];
 struct color black = {0,0,0};
-//char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.30", "192.168.77.55", "192.168.77.77"};
-char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.20", "192.168.77.55", "192.168.77.77"};
+char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.30", "192.168.77.55", "192.168.77.77"};
+//char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.1.200", "192.168.77.55", "192.168.77.77"};
 
 extern struct myfb_info *myfb;
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 {
 	int i, ret;
 	int fb_sock[VFB_MAX];
-	struct oo_fb_data *buf_monitor;
+//	struct oo_fb_data *buf_monitor;
 	bmphandle_t bh;
 	pthread_t ts_thread[VFB_MAX];
 	void *thread_ret[VFB_MAX];
@@ -62,8 +62,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "[MONITOR] %s connect error\n", ipaddr[0]);
 	}
 */
-//	for (i=1; i<VFB_MAX; i++) {
-	for (i=1; i<2; i++) {
+	for (i=1; i<VFB_MAX; i++) {
 		fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
 		if (fb_sock[i] < 0) 
 			fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
@@ -84,7 +83,7 @@ int main(int argc, char *argv[])
 	}
 
 	set_vfb_buf(VFB_MAX);
-	buf_monitor = alloc_net_buf(sizeof(struct oo_fb_data)*bmp_width(bh)*bmp_height(bh)*16/8);
+//	buf_monitor = alloc_net_buf(sizeof(struct oo_fb_data)*bmp_width(bh)*bmp_height(bh)*16/8);
 
 	ret = pthread_create(&ts_thread[0], NULL, ts_local_read, (void *)"local");
 	if (ret != 0) {
@@ -95,6 +94,7 @@ int main(int argc, char *argv[])
 	else
 		fprintf(stderr, "%d created\n", (int)ts_thread[0]);
 #endif
+
 	for (i=1; i<VFB_MAX; i++) {
 		if (ts_sock[i] > 0) {
 			ret = pthread_create(&ts_thread[i], NULL, ts_net_read, (void *)&(ts_sock[i]));
@@ -110,14 +110,20 @@ int main(int argc, char *argv[])
 	}
 	/* main loop */
 	while (quit != 0) {
+		if (check > 0)
+			continue;
+
 		clear_vfb_buf(VFB_MAX);
 		buf_bmp(bh, x, y);
 		for (i=1; i<VFB_MAX; i++) {
 			if (fb_sock[i] > 0) {
-//				fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
+				printf("Now transfer\n");
+				fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
+				printf("transfer complete\n");
 			}
 		}
 		show_vfb(vfb_list[0]);
+		check = 1;
 /*
 		if (fb_sock[0] > 0) {
 			monitor_bmp(bh, 0, 0, buf_monitor);
@@ -147,7 +153,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* clean up */
-	free_net_buf(buf_monitor);
+//	free_net_buf(buf_monitor);
 	free_vfb_buf(VFB_MAX);
 	bmp_close(bh);
 
@@ -197,10 +203,8 @@ void *ts_net_read(void *arg)
 #endif
 
 		x = 320;
-		write(sock, "1", 1);
+		check = 1;
 	}
-
-	write(sock, "0", 1);
 
 	shutdown(sock, SHUT_RDWR);
 	close(sock);
@@ -252,6 +256,7 @@ void *ts_local_read(void *arg)
 #endif
 
 		x = 0;
+		check = 1;
 		if (samp.x > 300)
 			break;
 	}

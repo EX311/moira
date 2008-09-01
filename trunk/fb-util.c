@@ -445,6 +445,7 @@ void put_string_center(int x, int y, char *s, struct color color)
 
 void myfb_close(void)
 {
+	clear_screen();
 	munmap(myfb->fb, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
 	close(myfb->fd);
 	free(myfb);
