@@ -1,6 +1,8 @@
 /*
  *  cctv_client app
  *  code by amon
+ *
+ *  using lib tslib, pthread  ->  -lts -lpthread
  */
 
 #include <stdio.h>
