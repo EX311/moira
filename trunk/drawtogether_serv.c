@@ -169,6 +169,7 @@ int tcp_server_accept(int serv_sock)
 	int ret;
 	struct sockaddr_in clnt_addr;
 	int clnt_addr_size = sizeof(clnt_addr);
+	memset(&clnt_addr,0,clnt_addr_size);
 	ret = accept(serv_sock, (struct sockaddr *)&clnt_addr, (socklen_t *)&clnt_addr_size);
 	if (ret == -1)
 	{
@@ -287,7 +288,7 @@ int main(int argc, char *argv[])
 	refresh_screen();
 
 	myaddr = argv[1];
-	serv_sock = tcp_server_listen(ip2port(myaddr,7000),2);
+	serv_sock = tcp_server_listen(ip2port(myaddr,7777),2);
 	if(serv_sock < 0)
 	{
 		perror("tcp_server_listen");
@@ -306,7 +307,7 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 		else{
-			connect = 1;
+			//connect = 1;
 #ifdef DEBUG
 			printf("accept successful!!\n");
 #endif
@@ -336,12 +337,14 @@ int main(int argc, char *argv[])
 					printf("server sent : %d\n",ret);
 				}
 #endif
+				buff[0] = '\0';
 			}
 			else if(!strcmp(buff,"Split"))
 			{
 				//split mode
 #ifdef DEBUG
 				printf("Split mode on\n");
+				buff[0] = '\0';
 #endif
 			}
 			else if(!strcmp(buff,"X"))
@@ -349,9 +352,13 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
 				printf("Exit\n");
 #endif
+				buff[0] = '\0';
+				break;
 			}
+			buff[0] = '\0';
 
 		}
+		close(clnt_sock);
 		
 	}
 	pthread_join(ts_thread, NULL);

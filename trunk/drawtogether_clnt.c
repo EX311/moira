@@ -162,17 +162,20 @@ int main()
 {
 	struct tsdev *ts;
 	int x,y,count=0;
+	FILE *fp;
 	int read_flag = 0;
-	unsigned int i;
+	unsigned int i,j;
 	unsigned int merge;
 	unsigned int mode = 0;
 	unsigned int numofdevice = 0;
-	unsigned short *buff,*old;
+	unsigned char *buff,*old;
+	//unsigned short temp;
 	int serv_sock;
 	char serv_addr[] = "192.168.77.77";
 
 	char *tsdevice="/dev/ts0";
 
+	fp = fopen("result.txt","r+w");
 
 	signal(SIGSEGV, sig);
 	signal(SIGINT, sig);
@@ -219,9 +222,9 @@ int main()
 	//what we need here is function that perform setting network connection
 	//between adjacent devices.
 
-	serv_sock = tcp_client_connect(serv_addr,ip2port(serv_addr,7000));
-	buff = (unsigned short *)malloc(fix.smem_len);
-	old = (unsigned short *)malloc(fix.smem_len);
+	serv_sock = tcp_client_connect(serv_addr,ip2port(serv_addr,7777));
+	buff = (unsigned char *)malloc(fix.smem_len);
+	old = (unsigned char *)malloc(fix.smem_len);
 	memset(buff,0,fix.smem_len);
 	memset(old,0,fix.smem_len);
 
@@ -268,7 +271,7 @@ int main()
 						count=0;
 						read_flag=0;
 						while(!read_flag){
-							ret = read(serv_sock,buff,fix.smem_len);
+							ret = read(serv_sock,buff+count,fix.smem_len);
 							if(ret<=0)
 							{
 								perror("read");
@@ -278,7 +281,7 @@ int main()
 #ifdef DEBUG
 							printf(" read : %d\n",count);
 #endif
-							if(count==fix.smem_len)
+							if(count>=fix.smem_len)
 							{
 								read_flag=1;
 							}
@@ -298,7 +301,18 @@ int main()
 #endif
 						for(i=0;i<fix.smem_len;i++)
 						{
+							//fprintf(stdout,"before fbuffer[%d] = %x buff[%d] = %x\n",i,fbuffer[i],i,buff[i]);
 							fbuffer[i]|=buff[i];
+#ifdef DEBUG
+							//printf("fbuffer[j] = %x fbuffer[j+1] = %x\n",fbuffer[j],fbuffer[j+1]);
+#endif
+							//temp = (unsigned short)fbuffer[j];
+#ifdef DEBUG
+							//fprintf(stdout,"after fbuffer[%d] = %x\n",i,fbuffer[i]);
+							//getchar();
+#endif
+							//temp |= buff[i];
+
 						}
 						merge = 1;
 						break;
