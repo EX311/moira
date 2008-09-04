@@ -1,7 +1,12 @@
 /*
- * only for cam testing
- * compile : arm-linux-gcc fb-util.c oo_network.c bmplib.c font_8x8.c cam_test.c -o test
- * run : /.test
+ *  Using VF cam app
+ * compile :arm-linux-gcc fb-util.c oo_network.c bmplib.c font_8x8.c cam_view.c -o OUT_FILE_NAME -lpthread -lts
+ * run : /.OUT_FILE_NAME
+ * code my amon
+ *
+ * func 1 is  320*240 image show my device
+ * func 2 is  320*240 image show my device and send same image to other device
+ * func 3 is  640*480 image show splited image  320*240 image * 4
  */
 
 
@@ -261,6 +266,21 @@ void send_data(func)
 	}
 }
 
+void clear_all_screen(void)
+{
+	int i;
+	memset( vfb_list[0], 0, myfb->fbfix.smem_len);
+
+	for (i=1; i<VFB_MAX; i++) 
+	{
+
+		fb_send(sock[i], vfb_list[0], myfb->fbfix.smem_len);
+	}
+
+
+}
+
+
 int main(void)
 {
 
@@ -368,6 +388,7 @@ int main(void)
 				put_string_center(140, 100, " exit cam app ", white);
 				sleep(2);
 				clear_screen();
+				clear_all_screen();
 				exit(0);
 			}
 			else if( event != 0 )
@@ -380,6 +401,7 @@ int main(void)
 
 		write(cam_fd,"X",2);	/* Stop Camera */
 		if (cam_fd) close(cam_fd);
+		clear_all_screen();
 	}
 
 
