@@ -107,8 +107,8 @@ void drow_rect (int x1, int y1, int x2, int y2, struct color color)
 /* 원 그리기 함수(더블버퍼링 적용) */
 void  dot( int x, int y, struct color *color) // write color pixel
 {
-	unsigned short *ptr;
-	
+	//unsigned short *ptr;
+
 	if ( 0 <= x && 0 <= y && x < myfb->fbvar.xres*2 && y < myfb->fbvar.yres*2 )
 	{
 		//ptr   = fb_mmap_temp + myfb->fbvar.xres * y + x;  // offset
@@ -345,7 +345,6 @@ void buf_test_rect(int x1, int y1, int x2, int y2, struct color color)
 void buf_rect(int x1, int y1, int x2, int y2, struct color color)
 {
 	int i, j;
-	int offset;
 
 	for(i = y1;i <= y2;i++)
 	{

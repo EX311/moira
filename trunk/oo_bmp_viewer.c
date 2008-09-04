@@ -62,7 +62,8 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "[MONITOR] %s connect error\n", ipaddr[0]);
 	}
 */
-	for (i=1; i<VFB_MAX; i++) {
+//	for (i=1; i<VFB_MAX; i++) {
+	for (i=1; i<2; i++) {
 		fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
 		if (fb_sock[i] < 0) 
 			fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
@@ -110,8 +111,8 @@ int main(int argc, char *argv[])
 	}
 	/* main loop */
 	while (quit != 0) {
-		if (check > 0)
-			continue;
+//		if (check > 0)
+//			continue;
 
 		clear_vfb_buf(VFB_MAX);
 		buf_bmp(bh, x, y);
