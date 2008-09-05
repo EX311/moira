@@ -5,15 +5,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+//#include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
+//#include <fcntl.h>
 #include <signal.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <linux/fb.h>
+//#include <sys/ioctl.h>
+//#include <sys/mman.h>
+//#include <sys/types.h>
+//#include <sys/socket.h>
+//#include <linux/fb.h>
 
 #include "oo.h"
 
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 {
 	int ret, count, offset;
 	int serv_sock, clnt_sock;
-	unsigned short *buff;
+//	unsigned short *buff;
 	char *myip;
 
 	if (argc < 2) {
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	if (serv_sock < 0)
 		exit(1);
 		
-	buff = (unsigned short *)malloc(myfb->fbfix.smem_len);
+//	buff = (unsigned short *)malloc(myfb->fbfix.smem_len);
 /* main process */
 
 	while (1) {
@@ -69,17 +69,18 @@ int main(int argc, char *argv[])
 		count = 0;
 		offset = 0;
 
-		while ( (ret = read(clnt_sock, buff+offset, BUFSIZ)) != 0) {
-			count += ret;
-			offset += ret/sizeof(unsigned short);
+//		while ( (ret = read(clnt_sock, buff+offset, BUFSIZ)) != 0) {
+		while ( (ret = read(clnt_sock, myfb->fb, myfb->fbfix.smem_len)) != 0) {
+//			count += ret;
+//			offset += ret/sizeof(unsigned short);
 #ifdef DEBUG
 			fprintf(stderr, "READ: #%d Total: #%d\n", ret, count);
 #endif
-			if (count == myfb->fbfix.smem_len) {
-				show_vfb(buff);
-				count = 0;
-				offset = 0;
-			}
+//			if (count == myfb->fbfix.smem_len) {
+//				show_vfb(buff);
+//				count = 0;
+//				offset = 0;
+//			}
 		}
 		clear_screen();
 		close(clnt_sock);

@@ -20,7 +20,7 @@ int x = 0;
 int y = 0;
 int ts_sock[VFB_MAX];
 struct color black = {0,0,0};
-char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.30", "192.168.77.55", "192.168.77.77"};
+char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.20", "192.168.77.55", "192.168.77.77"};
 //char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.1.200", "192.168.77.55", "192.168.77.77"};
 
 extern struct myfb_info *myfb;
@@ -118,9 +118,7 @@ int main(int argc, char *argv[])
 		buf_bmp(bh, x, y);
 		for (i=1; i<VFB_MAX; i++) {
 			if (fb_sock[i] > 0) {
-				printf("Now transfer\n");
 				fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
-				printf("transfer complete\n");
 			}
 		}
 		show_vfb(vfb_list[0]);
