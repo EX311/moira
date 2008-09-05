@@ -23,7 +23,7 @@
 
 #include "oo.h"
 
-#include "/home/work/source/rebis-2.6/drivers/media/video/userapp.h" // linux source tree for rebis
+#include "/home/amon/work/source/rebis-2.6/drivers/media/video/userapp.h" // linux source tree for rebis
 
 #define CODEC_NAME  "/dev/preview"
 
@@ -37,7 +37,8 @@ static camif_param_t camif_cfg;
 
 struct myfb_info* myfb ;
 
-char *ipaddr[VFB_MAX] = {"192.168.77.30", "192.168.77.20", "192.168.77.55", "192.168.77.77"};
+//                      { master ip[ screen 1], [screen 2] ,     [screen 3]   ,    [screen 4]    }
+char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
 
 int sock[VFB_MAX];
 int event = 0; 
@@ -259,6 +260,13 @@ void send_data(func)
 	int i ;
 	for (i=1; i<VFB_MAX; i++) 
 	{
+		/*   change ->  start i = 0
+		 *   if ( get_MasterLocation() == i )
+		 *    continue;
+		 *
+		 */
+
+		
 		if(func ==2)
 			fb_send(sock[i], vfb_list[0], myfb->fbfix.smem_len);
 		else if (func ==3)
@@ -275,7 +283,6 @@ void clear_all_screen(void)
 
 	for (i=1; i<VFB_MAX; i++) 
 	{
-
 		fb_send(sock[i], vfb_list[0], myfb->fbfix.smem_len);
 	}
 
@@ -389,9 +396,8 @@ int main(void)
 			{
 				put_string_center(140, 100, " exit cam app ", white);
 				sleep(2);
-				clear_screen();
-				clear_all_screen();
-				exit(0);
+				goto end;
+				
 			}
 			else if( event != 0 )
 			{	
@@ -403,11 +409,16 @@ int main(void)
 
 		write(cam_fd,"X",2);	/* Stop Camera */
 		if (cam_fd) close(cam_fd);
-		clear_all_screen();
+		//clear_all_screen();
 	}
 
 
+end:
 
+	clear_screen();
+//	clear_all_screen();
+	
+	thread_res= pthread_join(ts_thread, &thread_result);
 	for(i =0 ; i< VFB_MAX; i++)
 	{
 		free(sock[i]);
@@ -419,7 +430,7 @@ int main(void)
 		close(cam_fd);
 	}
 	free(cam_data);
-	thread_res= pthread_join(ts_thread, &thread_result);
+
 	myfb_close();
 	free_vfb_buf(VFB_MAX);
 	return 0;
