@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -82,6 +83,18 @@ void draw_icon(struct icon *icon)
 	put_string_center(icon->x+icon->w/2, icon->y+icon->h/2, icon->name, white);
 }
 
+
+int myicon_handle(struct icon *icon, struct ts_sample *samp)
+{
+	int inside = (samp->x >= icon->x) && (samp->y >= icon->y) && (samp->x < icon->x + icon->w) && (samp->y < icon->y + icon->h);
+	if (samp->pressure > 0) {
+		if (inside)
+			return inside;
+		else
+			return 0;
+	}
+	return 0;
+}
 /*
  *  ts_click func is thread fanc 
  *  
@@ -156,18 +169,6 @@ void *  ts_click(void* arg)
 
 
 
-
-int myicon_handle(struct icon *icon, struct ts_sample *samp)
-{
-	int inside = (samp->x >= icon->x) && (samp->y >= icon->y) && (samp->x < icon->x + icon->w) && (samp->y < icon->y + icon->h);
-	if (samp->pressure > 0) {
-		if (inside)
-			return inside;
-		else
-			return 0;
-	}
-	return 0;
-}
 
 int main(void)
 {

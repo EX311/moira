@@ -444,7 +444,7 @@ void put_string_center(int x, int y, char *s, struct color color)
 
 void myfb_close(void)
 {
-	clear_screen();
+//	clear_screen();
 	munmap(myfb->fb, myfb->fbvar.xres*myfb->fbvar.yres*16/8);
 	close(myfb->fd);
 	free(myfb);
@@ -460,7 +460,7 @@ void buf_bmp(bmphandle_t bh, int x, int y)	// buffer use inner rect
 			buf_pixel(j+x,i+y,pixel);
 		}
 }
-
+/*
 void monitor_bmp(bmphandle_t bh, int x, int y, struct oo_fb_data *data)
 {
 	int i, j, k = 0;
@@ -472,7 +472,7 @@ void monitor_bmp(bmphandle_t bh, int x, int y, struct oo_fb_data *data)
 				k++;
 			}
 }
-
+*/
 void clear_screen(void)
 {
 	memset(myfb->fb, 0, myfb->fbvar.xres*myfb->fbvar.yres*16/8);

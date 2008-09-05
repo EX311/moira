@@ -126,6 +126,7 @@ int main(int argc, char *argv[])
 		x += (2*ICONSIZE);
 	}
 
+	register_icon(&icon[1], 144, 48, "CAM", "/root/cam_view", bmp_list[1]);
 	while (1) {
 		int pid, status;
 		struct ts_sample samp;
