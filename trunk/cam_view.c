@@ -28,7 +28,7 @@
 #define CODEC_NAME  "/dev/preview"
 
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define FB_NAME    "/dev/fb0" 
 #define TTY_NAME   "/dev/ttyS0" 
@@ -39,7 +39,7 @@ struct myfb_info* myfb ;
 
 //                      { master ip[ screen 1], [screen 2] ,     [screen 3]   ,    [screen 4]    }
 //char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
-char *ipaddr[VFB_MAX] = {"192.168.123.182", "192.168.123.167", "192.168.123.172", "192.168.123.157"};
+char *ipaddr[VFB_MAX] = {"192.168.123.172", "192.168.123.167", "192.168.123.182", "192.168.123.157"};
 
 int sock[VFB_MAX];
 int event = 0; 
