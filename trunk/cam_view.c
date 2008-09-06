@@ -424,6 +424,15 @@ int main(void)
 
 		write(cam_fd,"X",2);	/* Stop Camera */
 		if (cam_fd) close(cam_fd);
+	
+		
+		for(i =0 ; i< VFB_MAX; i++)
+		{
+			if(sock[i])
+				close(sock[i]);
+		}
+		
+		
 		//clear_all_screen();
 	}
 
@@ -434,10 +443,11 @@ end:
 	//	clear_all_screen();
 
 	thread_res= pthread_join(ts_thread, &thread_result);
-	//	for(i =0 ; i< VFB_MAX; i++)
-	//	{
-	//		free(sock[i]);
-	//	}
+		for(i =0 ; i< VFB_MAX; i++)
+		{
+			if(sock[i])
+			close(sock[i]);
+		}
 
 	if (cam_fd > 0) 
 	{
