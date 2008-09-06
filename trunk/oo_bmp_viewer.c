@@ -8,20 +8,31 @@
 #include <stdio.h>
 #include <stdlib.h> /* for exit */
 #include <string.h>
+#include <dirent.h>
 #include <unistd.h> /* for open/close .. */
 #include <signal.h>
 #include <pthread.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <linux/fb.h>  /* for fb_var_screeninfo, FBIOGET_VSCREENINFO */
+
 #include "oo.h"
+
+struct bmplist {
+	int x, y, w, h;
+	char name[25];
+};
 
 int quit = 1, check = 0;
 int x = 0;
 int y = 0;
-int ts_sock[VFB_MAX];
+int ts_sock[VFB_MAX] = {-1,-1,-1,-1};
 struct color black = {0,0,0};
-char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.77.20", "192.168.77.55", "192.168.77.77"};
-//char *ipaddr[VFB_MAX] = {"192.168.1.10", "192.168.1.200", "192.168.77.55", "192.168.77.77"};
+struct color white = {0xff,0xff,0xff};
+struct bmplist list[10];
+
+char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
+char *file_bmp = NULL;
 
 extern struct myfb_info *myfb;
 
@@ -36,19 +47,108 @@ static void sig(int sig)
 	exit(1);
 }
 
+struct tsdev *ts_init(void)
+{
+	struct tsdev *t = ts_open("/dev/ts0", 0);
+	if (!t) {
+		perror("ts_open");
+		exit(1);
+	}
+	if (ts_config(t)) {
+		perror("ts_config");
+		exit(1);
+	}
+
+	return t;
+}
+
+void insert_list(struct bmplist *list, int y, char *name)
+{
+	list->x = myfb->fbvar.xres/2 - 100;
+	list->y = y;
+	list->w = 200;
+	list->h = 30;
+	memcpy(list->name, name, strlen(name));
+}
+
+int list_handle(struct bmplist *list, struct ts_sample *samp)
+{
+	int inside = (samp->x >= list->x) && (samp->y >= list->y) && (samp->x < list->x + list->w) && (samp->y < list->y + list->h);
+
+	if (samp->pressure > 0) {
+		if (inside) 
+			return 1;
+		else
+			return 0;
+	}
+
+	return 0;
+}
+
+void find_bmp(const char *dirname)
+{
+	int i, ret, count, chat, quit;
+	DIR *dp;
+	struct dirent *dirp;
+	struct ts_sample samp;
+	struct tsdev *ts = ts_init();
+
+	if ( (dp = opendir(dirname)) == NULL) {
+		perror("opendir");
+		exit(1);
+	}
+
+	i = 50;
+	quit = 1;
+	count = 0;
+	while ( (dirp = readdir(dp)) != NULL) {
+		if (strstr(dirp->d_name, ".bmp")) {
+			insert_list(&list[count], i, dirp->d_name);
+			put_string_center(myfb->fbvar.xres/2, i, dirp->d_name, white);
+			i += 30;
+			count++;
+			if (count >= 10)
+				break;
+		}
+	}
+	closedir(dp);
+
+	chat = 0;
+	while (quit > 0) {
+		ret = ts_read(ts, &samp, 1);
+		if (ret < 0) {
+			perror("ts_read");
+			continue;
+		}
+		if (ret != 1)
+			continue;
+
+		for (i=0; i<count; i++) {
+			if (list_handle(&list[i], &samp) > 0) {
+				if (chat < 20) {
+					chat++;
+					continue;
+				}
+
+				file_bmp = list[i].name;
+				quit = 0;
+			}
+		}
+	}
+
+	ts_close(ts);
+	return;
+}
+
 int main(int argc, char *argv[])
 {
-	int i, ret;
+	int i, ret, mode;
 	int fb_sock[VFB_MAX];
 //	struct oo_fb_data *buf_monitor;
 	bmphandle_t bh;
 	pthread_t ts_thread[VFB_MAX];
 	void *thread_ret[VFB_MAX];
-
-	if (argc < 2) {
-		printf("USAGE %s bmpfile\n", argv[0]);
-		exit(1);
-	}
+	char *invalid_msg = "Sorry, Maximum size 640x480";
 
 	signal(SIGSEGV, sig);
 	signal(SIGINT, sig);
@@ -56,31 +156,44 @@ int main(int argc, char *argv[])
 
 	/* initialize */
 	myfb = myfb_open();
+	find_bmp(".");
+
+	bh = bmp_open(file_bmp);
+	if (bh == NULL) {
+		perror("bmp_open");
+		exit(1);
+	}
+
+	if ( (bmp_width(bh) > 640) || (bmp_height(bh) > 480)) {
+		clear_screen();
+		put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, invalid_msg, white);
+		exit(0);
+	} else if ( (bmp_width(bh) <= 320) && (bmp_height(bh) <= 240)) {
+		mode = 0;
+	} else {
+		mode = 1;
+	} 
+
 /*
 	fb_sock[0] = tcp_client_connect(ipaddr[0], 8192);
 	if (fb_sock[0] < 0) {
 		fprintf(stderr, "[MONITOR] %s connect error\n", ipaddr[0]);
 	}
 */
-//	for (i=1; i<VFB_MAX; i++) {
-	for (i=1; i<2; i++) {
+	for (i=1; i<VFB_MAX; i++) {
 		fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
 		if (fb_sock[i] < 0) 
 			fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
 		else
 			fprintf(stderr, "[FB] %s connect success!\n", ipaddr[i]);
 
-		ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
-		if (ts_sock[i] < 0) 
-			fprintf(stderr, "[TS] %s connect error\n", ipaddr[i]);
-		else
-			fprintf(stderr, "[TS] %s connect success!\n", ipaddr[i]);
-	}
-
-	bh = bmp_open(argv[1]);
-	if (bh == NULL) {
-		perror("bmp_open");
-		exit(1);
+		if (mode == 0) {
+			ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
+			if (ts_sock[i] < 0) 
+				fprintf(stderr, "[TS] %s connect error\n", ipaddr[i]);
+			else
+				fprintf(stderr, "[TS] %s connect success!\n", ipaddr[i]);
+		}
 	}
 
 	set_vfb_buf(VFB_MAX);
@@ -111,8 +224,6 @@ int main(int argc, char *argv[])
 	}
 	/* main loop */
 	while (quit != 0) {
-//		if (check > 0)
-//			continue;
 
 		clear_vfb_buf(VFB_MAX);
 		buf_bmp(bh, x, y);
@@ -201,7 +312,14 @@ void *ts_net_read(void *arg)
 		fprintf(stderr, "%d -> %ld.%06ld: %6d %6d %6d\n", sock, samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
 #endif
 
-		x = 320;
+		if (sock == ts_sock[1]) {
+			x = 320; y = 0;
+		} else if (sock == ts_sock[2]) {
+			x = 0; y = 240;
+		} else if (sock == ts_sock[3]) {
+			x = 320; y = 240;
+		}
+
 		check = 1;
 	}
 
@@ -216,7 +334,7 @@ void *ts_local_read(void *arg)
 	int ret;
 	struct tsdev *ts;
 	struct ts_sample samp;
-	char *tsdevice = "/dev/ts0";
+	char *bye_msg = "Bye - thank you!";
 #ifdef DEBUG
 	fprintf(stderr, "%s started...\n", (char *)arg);
 #endif
@@ -232,16 +350,7 @@ void *ts_local_read(void *arg)
 		exit(1);
 	}
 
-	ts = ts_open(tsdevice, 0);
-	if (!ts) {
-		perror("ts_open");
-		exit(1);
-	}
-	if (ts_config(ts)) {
-		perror("ts_config");
-		exit(1);
-	}
-
+	ts = ts_init();
 	while (quit != 0) {
 		ret = ts_read(ts, &samp, 1);
 		if (ret < 0) {
@@ -254,10 +363,12 @@ void *ts_local_read(void *arg)
 		fprintf(stderr, "%s %ld.%06ld: %6d %6d %6d\n", (char *)arg, samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
 #endif
 
-		x = 0;
+		x = 0; y = 0;
 		check = 1;
-		if (samp.x > 300)
+		if (samp.x > 300) {
+			put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, bye_msg, white);
 			break;
+		}
 	}
 
 	ts_close(ts);

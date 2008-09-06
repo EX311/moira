@@ -35,7 +35,7 @@ struct ts_sample samp;
 
 struct myfb_info* myfb ;
 //char *taget_ip ;
-char *ipaddr[VFB_MAX] = {"192.168.77.20","192.168.77.30","192.168.77.77","192.168.88.55"};
+char *ipaddr[VFB_MAX] = {"192.168.123.182","192.168.123.172","192.168.123.157","192.168.88.55"};
 
 //static FILE * tty_fp;
 
