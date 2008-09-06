@@ -64,9 +64,9 @@ struct tsdev *ts_init(void)
 
 void insert_list(struct bmplist *list, int y, char *name)
 {
-	list->x = myfb->fbvar.xres/2 - 100;
+	list->x = 48;
 	list->y = y;
-	list->w = 200;
+	list->w = 224;
 	list->h = 30;
 	memcpy(list->name, name, strlen(name));
 }
@@ -104,6 +104,7 @@ void find_bmp(const char *dirname)
 	while ( (dirp = readdir(dp)) != NULL) {
 		if (strstr(dirp->d_name, ".bmp")) {
 			insert_list(&list[count], i, dirp->d_name);
+			drow_rect(list[count].x, list[count].y-15, list[count].x + list[count].w, list[count].y + list[count].h-15, white);
 			put_string_center(myfb->fbvar.xres/2, i, dirp->d_name, white);
 			i += 30;
 			count++;
@@ -264,11 +265,12 @@ int main(int argc, char *argv[])
 
 	/* clean up */
 //	free_net_buf(buf_monitor);
-	free_vfb_buf(VFB_MAX);
+	clear_vfb_buf(VFB_MAX);
 	bmp_close(bh);
 
 	for (i=0; i<VFB_MAX; i++) {
 		if (fb_sock[i] > 0) {
+			fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
 			shutdown(fb_sock[i], SHUT_WR);
 			close(fb_sock[i]);
 		}
@@ -279,6 +281,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	free_vfb_buf(VFB_MAX);
 	myfb_close();
 	printf("All Done!\n");
 	exit(0);
