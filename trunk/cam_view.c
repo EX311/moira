@@ -28,7 +28,7 @@
 #define CODEC_NAME  "/dev/preview"
 
 
-#define DEBUG 0
+#define DEBUG 1
 
 #define FB_NAME    "/dev/fb0" 
 #define TTY_NAME   "/dev/ttyS0" 
@@ -38,13 +38,15 @@ static camif_param_t camif_cfg;
 struct myfb_info* myfb ;
 
 //                      { master ip[ screen 1], [screen 2] ,     [screen 3]   ,    [screen 4]    }
-char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
+//char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
+char *ipaddr[VFB_MAX] = {"192.168.123.182", "192.168.123.167", "192.168.123.172", "192.168.123.157"};
 
 int sock[VFB_MAX];
 int event = 0; 
 int func = 0; // 1 is only master , 2 is master image send conneted slaves 3 is full screen mode 640*480
 unsigned char* cam_data;
-int cam_fd ;
+int cam_fd = 0 ;
+
 
 int image_size;
 
@@ -240,16 +242,21 @@ void cam_set(int func)
 		exit(1);
 	}
 
-	cam_fd = cam_init();
-#if DEBUG
-	printf(" cam init() cam_fd is %d\n", cam_fd);
-#endif
-	if (ioctl(cam_fd, CMD_CAMERA_INIT, &camif_cfg)) {
-		perror("ioctl");
-		exit(1);	
-	}
 
-	write(cam_fd,"O",2); // cam start code 
+	if ( func > 0 && func <4)
+	{
+
+		cam_fd = cam_init();
+#if DEBUG
+		printf(" cam init() cam_fd is %d func is %d\n", cam_fd, func);
+#endif
+		if (ioctl(cam_fd, CMD_CAMERA_INIT, &camif_cfg)) {
+			perror("ioctl");
+			exit(1);	
+		}
+
+		write(cam_fd,"O",2); // cam start code 
+	}
 }
 
 
@@ -266,7 +273,7 @@ void send_data(func)
 		 *
 		 */
 
-		
+
 		if(func ==2)
 			fb_send(sock[i], vfb_list[0], myfb->fbfix.smem_len);
 		else if (func ==3)
@@ -332,7 +339,7 @@ int main(void)
 	}
 
 	clear_screen();  
-	
+
 	for (i=0; i<myicon_count; i++)
 		draw_icon(&icon[i]);
 
@@ -343,6 +350,14 @@ int main(void)
 
 	while(1)
 	{
+
+		if (event == 9)
+		{
+			put_string_center(140, 100, " exit cam app ", white);
+			sleep(2);
+			goto end;
+
+		}
 		cam_set(func);
 
 		if(func == 2 || func == 3)
@@ -356,7 +371,7 @@ int main(void)
 				}
 			}
 		}
-	event = 0;
+		event = 0;
 		while(1)
 		{
 #if DEBUG
@@ -384,27 +399,27 @@ int main(void)
 			{
 				show_vfb(vfb_list[0]);//  demo ver need change 0 to  mylocation	
 			}
-			else if (func != 1)
+			else if (func != 1 &&  sock[1] > 0 )
 			{
 				send_data(func);
 				show_vfb(vfb_list[0]);//  demo ver need change 0 to  mylocation	
 			}
 			for (i=0; i<myicon_count; i++)
 				draw_icon(&icon[i]);
-			
+
 			if (event == 9)
 			{
 				put_string_center(140, 100, " exit cam app ", white);
 				sleep(2);
 				goto end;
-				
+
 			}
 			else if( event != 0 )
 			{	
 				break;
 			}
 
-		 }// end while "main lool"
+		}// end while "main lool"
 
 
 		write(cam_fd,"X",2);	/* Stop Camera */
@@ -416,20 +431,22 @@ int main(void)
 end:
 
 	clear_screen();
-//	clear_all_screen();
-	
-	thread_res= pthread_join(ts_thread, &thread_result);
-	for(i =0 ; i< VFB_MAX; i++)
-	{
-		free(sock[i]);
-	}
+	//	clear_all_screen();
 
-	if (cam_fd) 
+	thread_res= pthread_join(ts_thread, &thread_result);
+	//	for(i =0 ; i< VFB_MAX; i++)
+	//	{
+	//		free(sock[i]);
+	//	}
+
+	if (cam_fd > 0) 
 	{
 		write(cam_fd,"X",2);
 		close(cam_fd);
 	}
-	free(cam_data);
+
+	if (cam_data >0)
+		free(cam_data);
 
 	myfb_close();
 	free_vfb_buf(VFB_MAX);
