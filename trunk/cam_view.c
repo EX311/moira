@@ -23,7 +23,7 @@
 
 #include "oo.h"
 
-#include "/home/amon/work/source/rebis-2.6/drivers/media/video/userapp.h" // linux source tree for rebis
+#include "/home/work/source/rebis-2.6/drivers/media/video/userapp.h" // linux source tree for rebis
 
 #define CODEC_NAME  "/dev/preview"
 
@@ -37,10 +37,7 @@ static camif_param_t camif_cfg;
 
 struct myfb_info* myfb ;
 
-//                      { master ip[ screen 1], [screen 2] ,     [screen 3]   ,    [screen 4]    }
-//char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
-char *ipaddr[VFB_MAX] = {"192.168.123.172", "192.168.123.167", "192.168.123.182", "192.168.123.157"};
-
+extern char ipaddr[VFB_MAX][16];
 int sock[VFB_MAX];
 int event = 0; 
 int func = 0; // 1 is only master , 2 is master image send conneted slaves 3 is full screen mode 640*480
@@ -306,12 +303,10 @@ int main(void)
 
 	int count ;
 	int offset =0;
-	pid_t pid;
-
 	unsigned short buf_pix ;
 	struct color tmp_color;
 
-	int i,j, ret;
+	int i,j;
 
 
 	signal(SIGSEGV, sig);
@@ -319,6 +314,7 @@ int main(void)
 	signal(SIGTERM, sig);
 
 	myfb = myfb_open();
+	insert_ipaddr();
 
 	set_vfb_buf(VFB_MAX);
 #if DEBUG
@@ -364,11 +360,13 @@ int main(void)
 		{
 			for(i =0 ; i <VFB_MAX ; i++)
 			{
+			if (strlen(ipaddr[i]) > 12) {
 				sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i],8000));
 				if (sock[i] < 0)
 				{
 					fprintf(stderr, "%s connect error\n", ipaddr[i]);
 				}
+			}
 			}
 		}
 		event = 0;

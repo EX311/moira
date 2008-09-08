@@ -9,13 +9,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 
 #include "oo.h"
+#include "read_proc.h"
 
 extern struct myfb_info *myfb;
+
+char ipaddr[VFB_MAX][16];
 
 int error_handling(char *message)
 {
@@ -176,4 +181,41 @@ int free_net_buf(struct oo_fb_data *buf)
 		return 0;
 	}
 	return -1;
+}
+
+void insert_ipaddr(void)
+{
+	int i, ret, fd;
+	char myip[4] = {0,};
+	char temp_base_ip[16];
+	char temp_ip[4] = {0,};
+	char base_ip[16] = "192.168.123.";
+
+	fd = open("/root/config_MyIp", O_RDONLY);
+	if (fd < 0) {
+		strcpy(myip, "169");
+	} else {
+		ret = read(fd, myip, 3);
+		if (ret < 0) {
+			perror("read myip");
+			exit(1);
+		}
+	}
+
+	for (i=0; i<VFB_MAX; i++) {
+		ret = get_IpInfo(i, temp_ip);
+
+		if (strcmp(temp_ip, myip) == 0)
+			continue;
+		strcpy(temp_base_ip, base_ip);
+		strcat(temp_base_ip, temp_ip);
+		strcpy(ipaddr[i], temp_base_ip);
+#ifdef DEBUG
+		fprintf(stderr, "[%2d] %s\n", i, ipaddr[i]);
+#endif
+	}
+
+	if (fd > 0)
+		close(fd);
+	return;
 }

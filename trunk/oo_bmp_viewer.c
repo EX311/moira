@@ -17,11 +17,10 @@
 #include <linux/fb.h>  /* for fb_var_screeninfo, FBIOGET_VSCREENINFO */
 
 #include "oo.h"
-#include "read_proc.h"
 
 struct bmplist {
 	int x, y, w, h;
-	char name[25];
+	char name[30];
 };
 
 int quit = 1, check = 0;
@@ -30,7 +29,7 @@ int y = 0;
 int ts_sock[VFB_MAX] = {-1,-1,-1,-1};
 struct color black = {0,0,0};
 struct color white = {0xff,0xff,0xff};
-struct bmplist list[10];
+struct bmplist list[7];
 
 //char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
 char ipaddr[VFB_MAX][16];
@@ -64,25 +63,6 @@ struct tsdev *ts_init(void)
 	return t;
 }
 
-void insert_ipaddr(void)
-{
-	int i, ret;
-	char temp_ip[4] = {0,};
-	char base_ip[16] = "192.168.123.";
-
-	for (i=0; i<VFB_MAX; i++) {
-		ret = get_IpInfo(i, temp_ip);
-		temp_ip[ret-1] = '\0';
-		strncat(base_ip, temp_ip, 3);
-		strncpy(ipaddr[i], base_ip, 16);
-#ifdef DEBUG
-		printf("[%2d] %s\n", i, ipaddr[i]);
-#endif
-	}
-
-	return;
-}
-
 void insert_list(struct bmplist *list, int y, char *name)
 {
 	list->x = 48;
@@ -106,27 +86,30 @@ int list_handle(struct bmplist *list, struct ts_sample *samp)
 	return 0;
 }
 
-void find_bmp(const char *dirname)
+void find_bmp(char *dirname)
 {
 	int i, ret, count, chat, quit;
 	DIR *dp;
 	struct dirent *dirp;
 	struct ts_sample samp;
 	struct tsdev *ts = ts_init();
+	char temp[30];
 
 	if ( (dp = opendir(dirname)) == NULL) {
 		perror("opendir");
 		exit(1);
 	}
 
-	i = 50;
+	i = 30;
 	quit = 1;
 	count = 0;
 	while ( (dirp = readdir(dp)) != NULL) {
 		if (strstr(dirp->d_name, ".bmp")) {
-			insert_list(&list[count], i, dirp->d_name);
+			strcpy(temp, dirname);
+			strcat(temp, dirp->d_name);
+			insert_list(&list[count], i, temp);
 			drow_rect(list[count].x, list[count].y-15, list[count].x + list[count].w, list[count].y + list[count].h-15, white);
-			put_string_center(myfb->fbvar.xres/2, i, dirp->d_name, white);
+			put_string(96, i, dirp->d_name, white);
 			i += 30;
 			count++;
 			if (count >= 10)
@@ -157,6 +140,9 @@ void find_bmp(const char *dirname)
 			}
 		}
 	}
+#ifdef DEBUG
+	fprintf(stderr, "BMP: %s\n", file_bmp);
+#endif
 
 	ts_close(ts);
 	return;
@@ -166,7 +152,6 @@ int main(int argc, char *argv[])
 {
 	int i, ret, mode;
 	int fb_sock[VFB_MAX];
-//	struct oo_fb_data *buf_monitor;
 	bmphandle_t bh;
 	pthread_t ts_thread[VFB_MAX];
 	void *thread_ret[VFB_MAX];
@@ -178,7 +163,7 @@ int main(int argc, char *argv[])
 
 	/* initialize */
 	myfb = myfb_open();
-	find_bmp("/root/bmp");
+	find_bmp("/root/bmp/");
 	insert_ipaddr();
 
 	bh = bmp_open(file_bmp);
@@ -197,30 +182,25 @@ int main(int argc, char *argv[])
 		mode = 1;
 	} 
 
-/*
-	fb_sock[0] = tcp_client_connect(ipaddr[0], 8192);
-	if (fb_sock[0] < 0) {
-		fprintf(stderr, "[MONITOR] %s connect error\n", ipaddr[0]);
-	}
-*/
-	for (i=1; i<VFB_MAX; i++) {
-		fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
-		if (fb_sock[i] < 0) 
-			fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
-		else
-			fprintf(stderr, "[FB] %s connect success!\n", ipaddr[i]);
-
-		if (mode == 0) {
-			ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
-			if (ts_sock[i] < 0) 
-				fprintf(stderr, "[TS] %s connect error\n", ipaddr[i]);
+	for (i=0; i<VFB_MAX; i++) {
+		if (strlen(ipaddr[i]) > 12) {
+			fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
+			if (fb_sock[i] < 0) 
+				fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
 			else
-				fprintf(stderr, "[TS] %s connect success!\n", ipaddr[i]);
+				fprintf(stderr, "[FB] %s connect success!\n", ipaddr[i]);
+
+			if (mode == 0) {
+				ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
+				if (ts_sock[i] < 0) 
+					fprintf(stderr, "[TS] %s connect error\n", ipaddr[i]);
+				else
+					fprintf(stderr, "[TS] %s connect success!\n", ipaddr[i]);
+			}
 		}
 	}
 
 	set_vfb_buf(VFB_MAX);
-//	buf_monitor = alloc_net_buf(sizeof(struct oo_fb_data)*bmp_width(bh)*bmp_height(bh)*16/8);
 
 	ret = pthread_create(&ts_thread[0], NULL, ts_local_read, (void *)"local");
 	if (ret != 0) {
@@ -256,13 +236,8 @@ int main(int argc, char *argv[])
 			}
 		}
 		show_vfb(vfb_list[0]);
+
 		check = 1;
-/*
-		if (fb_sock[0] > 0) {
-			monitor_bmp(bh, 0, 0, buf_monitor);
-			ret = write(fb_sock[0], buf_monitor, sizeof(struct oo_fb_data)*bmp_width(bh)*bmp_height(bh)*16/8);
-		}
-*/
 	}
 
 	for (i=0; i<VFB_MAX; i++) {
@@ -286,7 +261,6 @@ int main(int argc, char *argv[])
 	}
 
 	/* clean up */
-//	free_net_buf(buf_monitor);
 	clear_vfb_buf(VFB_MAX);
 	bmp_close(bh);
 

@@ -40,6 +40,7 @@ extern int data4monitor(struct oo_fb_data *, int , int, unsigned short);
 
 extern struct oo_fb_data *alloc_net_buf(int);
 extern int free_net_buf(struct oo_fb_data *);
+extern void insert_ipaddr(void);
 
 extern void buf_bmp(bmphandle_t, int, int);
 extern void monitor_bmp(bmphandle_t, int, int, struct oo_fb_data *);
