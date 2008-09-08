@@ -2,8 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#define DEBUG 0
+#include <unistd.h>
 
 char get_IsConnect(void)
 {
@@ -69,7 +68,6 @@ int get_IpInfo(int place, char* get_data)
 {
 	int fd;
 	int cnt;
-	int i;
 	memset(get_data,0,15);
 	fd=IpInfo_fd_return(place);
 	cnt = read(fd,get_data,15);
@@ -87,7 +85,6 @@ int set_IpInfo(int place, char* ip)
 	int fd;
 //	char buf[4]={0,};
 //	int cnt;
-	int i;
 
 //	sprintf(buf,"%d",ip);
 
@@ -104,7 +101,6 @@ int get_AfterMasterIp(int place,char* get_data)
 {
 	int fd;
 	int cnt;
-	int i;
 	memset(get_data,0,sizeof(get_data));
 	fd=AfterMasterIp_fd_return(place);
 	cnt = read(fd,get_data,sizeof(get_data)-1);
@@ -121,8 +117,6 @@ int set_AfterMasterIp(int place, int ip)
 {
 	int fd;
 	char buf[1024];
-	int cnt;
-	int i;
 	sprintf(buf,"%d",ip);
 
 	fd=AfterMasterIp_fd_return(place);
@@ -141,7 +135,6 @@ int get_MyLocation(void)
 	int fd;
 	char buf;
 	int cnt;
-	int i;
 	int res;
 	fd=MyLocation_fd_return();
 	cnt = read(fd,&buf,sizeof(buf));
@@ -158,8 +151,6 @@ int set_MyLocation(int MyLocation)
 {
 	int fd;
 	char buf;
-	int cnt;
-	int i;
 	
 	sprintf(&buf,"%d",MyLocation);
 	fd=MyLocation_fd_return();
@@ -197,9 +188,6 @@ int set_MasterLocation(int MasterLocation)
 {
 	int fd;
 	char buf;
-	int cnt;
-	int i;
-
 
 	sprintf(&buf,"%d",MasterLocation);
 	fd=MasterLocation_fd_return();
@@ -218,7 +206,6 @@ int get_DeviceAttached(void)
 	int fd;
 	int cnt;
 	char buf;
-	int i;
 	int res;
 	fd=DeviceAttached_fd_return();
 	cnt = read(fd,&buf,sizeof(buf));
@@ -236,8 +223,6 @@ int set_DeviceAttached(int DeviceAttached)
 {
 	int fd;
 	char buf;
-	int cnt;
-	int i;
 
 	sprintf(&buf,"%d",DeviceAttached);
 	fd=DeviceAttached_fd_return();
