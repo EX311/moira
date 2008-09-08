@@ -2,196 +2,283 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
+extern "C" {
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+}
 
 #include "tslib.h"
 #include "oo.h"
 
+#define	MAX_CMD		6
 #define	ICONSIZE	48
-extern struct myfb_info *myfb;
 
 struct icon {
 	int x, y, w, h;
 	char *name;
-	char *action;
-	char *arg;
+	struct color color;
+	struct icon *next;
 };
 
-int chat_count = 0;
-int icon_count = 5;
-char *program_list = "BMP";
+struct cmd_list {
+	char *path;
+	char *args;
+	struct cmd_list *next;
+};
+
+extern struct myfb_info *myfb;
+
+int icon_count, chat_count = 0;
+char *file_ui = "oo_ui.lua";
+struct icon *head = NULL;
+struct cmd_list *cmdlist = NULL;
 struct color white = {0xff, 0xff, 0xff};
 
-static void sig(int sig)
+void insert_icon(int x, int y, char *name, struct color color)
 {
-	fflush(stderr);
-	printf("Quit - Sig #%d caught\n", sig);
-	fflush(stdout);
-	exit(1);
+	struct icon *temp;
+	struct icon *p_temp = head;
+	if (p_temp == NULL) {
+		temp = (struct icon *)malloc(sizeof(struct icon));
+		temp->x = x;
+		temp->y = y;
+		temp->w = ICONSIZE;
+		temp->h = ICONSIZE;
+		temp->color = color;
+		temp->name = (char *)malloc(strlen(name)+1);
+		memcpy(temp->name, name, strlen(name));
+		temp->name[strlen(name)] = '\0';
+		temp->next = NULL;
+		head = temp;
+	} else {
+		while (p_temp->next != NULL)
+			p_temp = p_temp->next;
+
+		temp = (struct icon *)malloc(sizeof(struct icon));
+		temp->x = x;
+		temp->y = y;
+		temp->w = ICONSIZE;
+		temp->h = ICONSIZE;
+		temp->color = color;
+		temp->name = (char *)malloc(strlen(name)+1);
+		memcpy(temp->name, name, strlen(name));
+		temp->name[strlen(name)] = '\0';
+		temp->next = NULL;
+		p_temp->next = temp;
+	}
 }
 
-void register_icon(struct icon *icon, int x, int y, char *name, char *action, char *arg)
+void free_icon(void)
 {
-	char *t_temp = (char *)malloc(strlen(name)+1);
-	char *t_act = (char *)malloc(strlen(action)+1);
-	char *t_arg = (char *)malloc(strlen(arg)+1);
-	memcpy(t_temp, name, strlen(name));
-	t_temp[strlen(name)] = '\0';
-	memcpy(t_act, action, strlen(action));
-	t_act[strlen(action)] = '\0';
-	memcpy(t_arg, arg, strlen(arg));
-	t_arg[strlen(arg)] = '\0';
+	struct icon *temp;
+	struct icon *p_temp = head;
+	while (p_temp->next) {
+		temp = p_temp->next;
+		if (p_temp->name)
+			free(p_temp->name);
+		free(p_temp);
+		p_temp = temp;
+	}
 
-	icon->x = x;
-	icon->y = y;
-	icon->w = icon->h = ICONSIZE;
-	icon->name = t_temp;
-	icon->action = t_act;
-	icon->arg = t_arg;
+	if (p_temp->name)
+		free(p_temp->name);
+	free(p_temp);
+	head = NULL;
 }
 
-void free_icon(struct icon *icon)
+int lua_set_icon_count(lua_State *L)
 {
-	if (icon->name)
-		free(icon->name);
-	if (icon->action)
-		free(icon->action);
-	if (icon->arg)
-		free(icon->arg);
+	lua_gettop(L);
+	icon_count = (int)lua_tonumber(L,1);
+
+	printf("count #%d\n", icon_count);
+	return 0;
+}
+
+int lua_set_icon_info(lua_State *L)
+{
+	lua_gettop(L);
+	insert_icon((int)lua_tonumber(L,1), (int)lua_tonumber(L,2), (char *)lua_tostring(L,3), reveres_pixel((unsigned short)lua_tonumber(L,4)));
+	return 0;
+}
+
+void insert_cmd(char *path, char *args)
+{
+	struct cmd_list *temp;
+	struct cmd_list *p_temp = cmdlist;
+	if (p_temp == NULL) {
+		temp = (struct cmd_list *)malloc(sizeof(struct cmd_list));
+		temp->path = (char *)malloc(strlen(path)+1);
+		memcpy(temp->path, path, strlen(path));
+		temp->path[strlen(path)] = '\0';
+		temp->args = (char *)malloc(strlen(args)+1);
+		memcpy(temp->args, args, strlen(args));
+		temp->args[strlen(args)] = '\0';
+		temp->next = NULL;
+		cmdlist = temp;
+	} else {
+		while (p_temp->next != NULL)
+			p_temp = p_temp->next;
+
+		temp = (struct cmd_list *)malloc(sizeof(struct cmd_list));
+		temp->path = (char *)malloc(strlen(path)+1);
+		memcpy(temp->path, path, strlen(path));
+		temp->path[strlen(path)] = '\0';
+		temp->args = (char *)malloc(strlen(args)+1);
+		memcpy(temp->args, args, strlen(args));
+		temp->args[strlen(args)] = '\0';
+		temp->next = NULL;
+		p_temp->next = temp;
+	}
+}
+
+void free_cmd(void)
+{
+	struct cmd_list *temp;
+	struct cmd_list *p_temp = cmdlist;
+	while (p_temp->next) {
+		temp = p_temp->next;
+		if (p_temp->path)
+			free(p_temp->path);
+		if (p_temp->args)
+			free(p_temp->args);
+		free(p_temp);
+		p_temp = temp;
+	}
+
+	if (p_temp->path)
+		free(p_temp->path);
+	if (p_temp->args)
+		free(p_temp->args);
+	free(p_temp);
+	cmdlist = NULL;
+}
+
+int lua_set_cmd_list(lua_State *L)
+{
+	lua_gettop(L);
+	insert_cmd((char *)lua_tostring(L,1), (char *)lua_tostring(L,2));
+	return 0;
 }
 
 void draw_icon(struct icon *icon)
 {
-	drow_rect(icon->x, icon->y, icon->x+icon->w, icon->y+icon->h, white);
-	put_string_center(icon->x+icon->w/2, icon->y+icon->h/2, icon->name, white);
+	drow_rect(icon->x, icon->y, icon->x + icon->w, icon->y + icon->h, icon->color);
+	put_string_center(icon->x + icon->w/2, icon->y + icon->h/2, icon->name, icon->color);
 }
 
-char *icon_handle(struct icon *icon, struct ts_sample *samp)
+int icon_handle(struct icon *icon, struct ts_sample *samp)
 {
 	int inside = (samp->x >= icon->x) && (samp->y >= icon->y) && (samp->x < icon->x + icon->w) && (samp->y < icon->y + icon->h);
-
 	if (samp->pressure > 0) {
 		if (inside) {
 			chat_count++;
-			return icon->action;
+			return 1;
 		} else
-			return NULL;
+			return 0;
 	}
 
-	return NULL;
+	return 0;
 }
 
-int main(int argc, char *argv[])
+struct tsdev *ts_init(void)
 {
-	int ret, x, y, i;
-	struct tsdev *ts;
-	struct icon icon[icon_count];
-	char *tsdevice = "/dev/ts0";
-	char *bmp_list[icon_count];
-
-	bmp_list[0] = "rebis.bmp";
-	bmp_list[1] = "sooae.bmp";
-	bmp_list[2] = "zero1.bmp";
-	bmp_list[3] = "yuna.bmp";
-	bmp_list[4] = "alba.bmp";
-
-	signal(SIGSEGV, sig);
-	signal(SIGINT, sig);
-	signal(SIGTERM, sig);
-
-	printf("theMeal: oo_ui started!\n");
-
-	myfb = myfb_open();
-
-	ts = ts_open(tsdevice, 0);
-	if (!ts) {
+	struct tsdev *t = ts_open("/dev/ts0", 0);
+	if (!t) {
 		perror("ts_open");
 		exit(1);
 	}
-
-	if (ts_config(ts)) {
+	if (ts_config(t)) {
 		perror("ts_config");
 		exit(1);
 	}
 
-	x = y = ICONSIZE;
-	for (i=0; i<icon_count; i++) {
-		if ( (i != 0) && (i%3 == 0)) {
-			x = ICONSIZE;
-			y += (2*ICONSIZE);
-		}
-		register_icon(&icon[i], x, y, "BMP", "/root/bmp", bmp_list[i]);
-		x += (2*ICONSIZE);
-	}
+	return t;
+}
 
-	register_icon(&icon[1], 144, 48, "CAM", "/root/cam_view", bmp_list[1]);
+int main(int argc, char *argv[])
+{
+	int ret;
+	struct tsdev *ts;
+	lua_State *L;
+
+	myfb = myfb_open();
+	ts = ts_init();
+
+	L = luaL_newstate();
+	luaopen_base(L);
+
+	lua_register(L, "set_count", lua_set_icon_count);
+	lua_register(L, "set_icon", lua_set_icon_info);
+	lua_register(L, "set_cmd", lua_set_cmd_list);
+
+	luaL_dofile(L, file_ui);
+	lua_close(L);
+
 	while (1) {
-		int pid, status;
+		int pid, state = 0;
 		struct ts_sample samp;
-		char *t;
+		struct icon *i;
+		struct cmd_list *j;
 
 		clear_screen();
-		for (i=0; i<icon_count; i++)
-			draw_icon(&icon[i]);
-
-		ret = ts_read(ts, &samp, 1);
-
-		if (ret < 0) {
-			perror("ts_read");
-			exit(1);
+		if (head == NULL) {
+			put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, "Sorry, No Apps. registered!", white);
+#ifdef DEBUG
+			fprintf(stderr, "No Apps!\n");
+#endif
+			break;
 		}
 
+		for (i=head; i != NULL; i=i->next)
+			draw_icon(i);
+
+		ret = ts_read(ts, &samp, 1);
+		if (ret < 0) {
+			perror("ts_read");
+			continue;
+		}
 		if (ret != 1)
 			continue;
 
-		if (samp.x > 300 && samp.y > 220)
+		if (samp.x > 310 && samp.y >230)
 			break;
 
-		for (i=0; i<=icon_count; i++) {
-			if ( (t = icon_handle(&icon[i], &samp))) {
+		for (i=head, j=cmdlist; i != NULL; i=i->next, j=j->next) {
+			if (icon_handle(i, &samp) > 0) {
 				if (chat_count < 20)
 					continue;
 				chat_count = 0;
-				
-				printf("TEST :%s\n", t);
-			
+
 				pid = fork();
 				if (pid == 0) {
 #ifdef DEBUG
-					printf("Child PID #%d\n", getpid());
+					fprintf(stderr, " *** This is CHILD! ***\n");
 #endif
-					ret = execl(icon[i].action, icon[i].name, icon[i].arg, 0);
-//					ret = execl("/bin/ls", "ls", "-l", 0);
+					if (j)
+						ret = execl(j->path, j->args, 0);
 					if (ret < 0) {
 						perror("execl");
 						exit(1);
 					}
 				} else {
-#ifdef DEBUG
-					printf("Exec PID #%d\n", pid);
-#endif
 					sleep(1);
-					wait(&status);
+					wait(&state);
 #ifdef DEBUG
-					printf("Child terminated by #%d\n", status);
+					fprintf(stderr, " *** End of CHILD! ***\n");
 #endif
-
 				}
 			}
 		}
-
-#ifdef DEBUG
-//		printf("%ld.%06ld: %6d %6d %6d\n", samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
-#endif
 	}
 
+	free_icon();
+	free_cmd();
 	ts_close(ts);
 	myfb_close();
-#ifdef DEBUG
-	printf("\n *** All done completely. ***\n");
-#endif
-	exit(0);
 	return 0;
 }

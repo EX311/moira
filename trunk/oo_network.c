@@ -20,6 +20,7 @@
 
 extern struct myfb_info *myfb;
 extern char ipaddr[VFB_MAX][16];
+extern int mylocation;
 
 int error_handling(char *message)
 {
@@ -208,8 +209,10 @@ void insert_ipaddr(void)
 		ret = get_IpInfo(i, temp_ip);
 		temp_ip[ret] = '\0';
 
-		if (strncmp(temp_ip, myip, 3) == 0)
+		if (strncmp(temp_ip, myip, 3) == 0) {
+			mylocation = i;
 			continue;
+		}
 		strncpy(temp_base_ip, base_ip, 12);
 		temp_base_ip[12] = '\0';
 		strncat(temp_base_ip, temp_ip, 3);

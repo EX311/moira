@@ -35,6 +35,7 @@ struct color white = {0xff,0xff,0xff};
 struct bmplist list[7];
 
 //char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
+int mylocation;
 char ipaddr[VFB_MAX][16];
 char *file_bmp = NULL;
 
@@ -215,7 +216,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "%d created\n", (int)ts_thread[0]);
 #endif
 
-	for (i=1; i<VFB_MAX; i++) {
+	for (i=0; i<VFB_MAX; i++) {
 		if (ts_sock[i] > 0) {
 			ret = pthread_create(&ts_thread[i], NULL, ts_net_read, (void *)&(ts_sock[i]));
 			if (ret != 0) {
@@ -233,12 +234,12 @@ int main(int argc, char *argv[])
 
 		clear_vfb_buf(VFB_MAX);
 		buf_bmp(bh, x, y);
-		for (i=1; i<VFB_MAX; i++) {
+		for (i=0; i<VFB_MAX; i++) {
 			if (fb_sock[i] > 0) {
 				fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
 			}
 		}
-		show_vfb(vfb_list[0]);
+		show_vfb(vfb_list[mylocation]);
 
 		check = 1;
 	}
