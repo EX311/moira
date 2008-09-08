@@ -31,9 +31,12 @@ struct cmd_list {
 };
 
 extern struct myfb_info *myfb;
+extern unsigned short *vfb_list[VFB_MAX];
 
 int icon_count, chat_count = 0;
 char *file_ui = "oo_ui.lua";
+char bg_image[25];
+struct color bgcolor;
 struct icon *head = NULL;
 struct cmd_list *cmdlist = NULL;
 struct color white = {0xff, 0xff, 0xff};
@@ -94,8 +97,9 @@ int lua_set_icon_count(lua_State *L)
 {
 	lua_gettop(L);
 	icon_count = (int)lua_tonumber(L,1);
-
-	printf("count #%d\n", icon_count);
+#ifdef DEBUG
+	fprintf(stderr, "icon count #%d\n", icon_count);
+#endif
 	return 0;
 }
 
@@ -165,6 +169,52 @@ int lua_set_cmd_list(lua_State *L)
 	return 0;
 }
 
+void set_bgcolor(void)
+{
+	memset(myfb->fb, makepixel(bgcolor), myfb->fbvar.xres*15);
+}
+
+int lua_set_bgcolor(lua_State *L)
+{
+	lua_gettop(L);
+	bgcolor.r = (unsigned short)lua_tonumber(L,1);
+	bgcolor.g = (unsigned short)lua_tonumber(L,2);
+	bgcolor.b = (unsigned short)lua_tonumber(L,3);
+#ifdef DEBUG
+	fprintf(stderr, "BG COLOR : #%x%x%x\n", bgcolor.r, bgcolor.g, bgcolor.b);
+#endif
+	return 0;
+}
+
+void set_bgimage(void)
+{
+	if (chat_count > 0)
+		return;
+	bmphandle_t bh;
+
+	set_vfb_buf(1);
+	bh = bmp_open(bg_image);
+	if (bh == NULL) {
+		perror("bmp_open");
+		return;
+	}
+	buf_bmp(bh, 0, 0);
+	show_vfb(vfb_list[0]);
+	bmp_close(bh);
+	free_vfb_buf(1);
+}
+
+int lua_set_bgimage(lua_State *L)
+{
+	size_t len;
+	lua_gettop(L);
+	memcpy(bg_image, (char *)lua_tolstring(L, 1, &len), len);
+#ifdef DEBUG
+	fprintf(stderr, "BG image : %s\n", bg_image);
+#endif
+	return 0;
+}
+
 void draw_icon(struct icon *icon)
 {
 	drow_rect(icon->x, icon->y, icon->x + icon->w, icon->y + icon->h, icon->color);
@@ -178,8 +228,9 @@ int icon_handle(struct icon *icon, struct ts_sample *samp)
 		if (inside) {
 			chat_count++;
 			return 1;
-		} else
+		} else {
 			return 0;
+		}
 	}
 
 	return 0;
@@ -215,6 +266,8 @@ int main(int argc, char *argv[])
 	lua_register(L, "set_count", lua_set_icon_count);
 	lua_register(L, "set_icon", lua_set_icon_info);
 	lua_register(L, "set_cmd", lua_set_cmd_list);
+	lua_register(L, "set_bgcolor", lua_set_bgcolor);
+	lua_register(L, "set_bgimage", lua_set_bgimage);
 
 	luaL_dofile(L, file_ui);
 	lua_close(L);
@@ -225,7 +278,8 @@ int main(int argc, char *argv[])
 		struct icon *i;
 		struct cmd_list *j;
 
-		clear_screen();
+		set_bgimage();
+		set_bgcolor();
 		if (head == NULL) {
 			put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, "Sorry, No Apps. registered!", white);
 #ifdef DEBUG
@@ -275,6 +329,9 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
+
+	clear_screen();
+	put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, "Thanks for Use!", white);
 
 	free_icon();
 	free_cmd();
