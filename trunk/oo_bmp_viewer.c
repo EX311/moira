@@ -10,13 +10,16 @@
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h> /* for open/close .. */
+#include <fcntl.h>
 #include <signal.h>
 #include <pthread.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <linux/fb.h>  /* for fb_var_screeninfo, FBIOGET_VSCREENINFO */
 
 #include "oo.h"
+#include "read_proc.h"
 
 struct bmplist {
 	int x, y, w, h;
@@ -183,7 +186,7 @@ int main(int argc, char *argv[])
 	} 
 
 	for (i=0; i<VFB_MAX; i++) {
-		if (strlen(ipaddr[i]) > 12) {
+		if (strlen(ipaddr[i]) > 13) {
 			fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
 			if (fb_sock[i] < 0) 
 				fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);

@@ -19,8 +19,7 @@
 #include "read_proc.h"
 
 extern struct myfb_info *myfb;
-
-char ipaddr[VFB_MAX][16];
+extern char ipaddr[VFB_MAX][16];
 
 int error_handling(char *message)
 {
@@ -187,7 +186,7 @@ void insert_ipaddr(void)
 {
 	int i, ret, fd;
 	char myip[4] = {0,};
-	char temp_base_ip[16];
+	char temp_base_ip[16]; 
 	char temp_ip[4] = {0,};
 	char base_ip[16] = "192.168.123.";
 
@@ -202,13 +201,18 @@ void insert_ipaddr(void)
 		}
 	}
 
+#ifdef DEBUG
+	fprintf(stderr, "MyIP: %s\n", myip);
+#endif
 	for (i=0; i<VFB_MAX; i++) {
 		ret = get_IpInfo(i, temp_ip);
+		temp_ip[ret] = '\0';
 
-		if (strcmp(temp_ip, myip) == 0)
+		if (strncmp(temp_ip, myip, 3) == 0)
 			continue;
-		strcpy(temp_base_ip, base_ip);
-		strcat(temp_base_ip, temp_ip);
+		strncpy(temp_base_ip, base_ip, 12);
+		temp_base_ip[12] = '\0';
+		strncat(temp_base_ip, temp_ip, 3);
 		strcpy(ipaddr[i], temp_base_ip);
 #ifdef DEBUG
 		fprintf(stderr, "[%2d] %s\n", i, ipaddr[i]);

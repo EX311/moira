@@ -27,17 +27,14 @@
 
 #define CODEC_NAME  "/dev/preview"
 
-
-#define DEBUG 0
-
 #define FB_NAME    "/dev/fb0" 
 #define TTY_NAME   "/dev/ttyS0" 
 
 static camif_param_t camif_cfg;
-
 struct myfb_info* myfb ;
 
-extern char ipaddr[VFB_MAX][16];
+char ipaddr[VFB_MAX][16];
+
 int sock[VFB_MAX];
 int event = 0; 
 int func = 0; // 1 is only master , 2 is master image send conneted slaves 3 is full screen mode 640*480
@@ -360,7 +357,7 @@ int main(void)
 		{
 			for(i =0 ; i <VFB_MAX ; i++)
 			{
-			if (strlen(ipaddr[i]) > 12) {
+			if (strlen(ipaddr[i]) > 13) {
 				sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i],8000));
 				if (sock[i] < 0)
 				{
