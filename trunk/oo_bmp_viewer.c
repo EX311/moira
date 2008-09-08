@@ -17,6 +17,7 @@
 #include <linux/fb.h>  /* for fb_var_screeninfo, FBIOGET_VSCREENINFO */
 
 #include "oo.h"
+#include "read_proc.h"
 
 struct bmplist {
 	int x, y, w, h;
@@ -31,7 +32,8 @@ struct color black = {0,0,0};
 struct color white = {0xff,0xff,0xff};
 struct bmplist list[10];
 
-char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
+//char *ipaddr[VFB_MAX] = {"192.168.123.167", "192.168.123.182", "192.168.123.172", "192.168.123.157"};
+char ipaddr[VFB_MAX][16];
 char *file_bmp = NULL;
 
 extern struct myfb_info *myfb;
@@ -60,6 +62,25 @@ struct tsdev *ts_init(void)
 	}
 
 	return t;
+}
+
+void insert_ipaddr(void)
+{
+	int i, ret;
+	char temp_ip[4] = {0,};
+	char base_ip[16] = "192.168.123.";
+
+	for (i=0; i<VFB_MAX; i++) {
+		ret = get_IpInfo(i, temp_ip);
+		temp_ip[ret-1] = '\0';
+		strncat(base_ip, temp_ip, 3);
+		strncpy(ipaddr[i], base_ip, 16);
+#ifdef DEBUG
+		printf("[%2d] %s\n", i, ipaddr[i]);
+#endif
+	}
+
+	return;
 }
 
 void insert_list(struct bmplist *list, int y, char *name)
@@ -157,7 +178,8 @@ int main(int argc, char *argv[])
 
 	/* initialize */
 	myfb = myfb_open();
-	find_bmp(".");
+	find_bmp("/root/bmp");
+	insert_ipaddr();
 
 	bh = bmp_open(file_bmp);
 	if (bh == NULL) {
