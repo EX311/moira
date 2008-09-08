@@ -1,0 +1,21 @@
+CC = arm-linux-gcc
+//CC = gcc
+Master : MasterIpSet.c read_proc_fd.c read_proc_function.c
+	$(CC) -o $@ $^
+
+reUart : reUart.c read_proc_fd.c read_proc_function.c
+	$(CC) -o $@ $^
+
+random_write : random_write.c read_proc_fd.c read_proc_function.c
+	$(CC) -o $@ $^ 
+
+calc_proc : read_proc_fd.c read_proc_function.c calc_proc.c 
+	$(CC) -o $@ $^ 
+
+UI : read_proc_fd.c read_proc_function.c start_UI.c 
+	$(CC) -o $@ $^ 
+
+clean : 
+	@rm -rf *.o read_proc
+	
+
