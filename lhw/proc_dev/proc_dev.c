@@ -51,11 +51,13 @@ char DeviceAttached_data[DATASIZE]={0,};
 // eof: 파일의 끝일경우 1로 셋팅된다.
 // start: 커널 어느곳에도 사용되지 않으며, 
 // data_unused: 여러파일들에 대한 하나의 콜백함수를 생성하는데 쓰일수 있다. 
+
+
 int get_IsConnect(char *page, char **start, off_t off, int count, int *eof, void *data_unused)
 {
 
 	char len;
-	len = sprintf(page, "IsConnect is %s\n",(char*)data_unused);
+	len = sprintf(page, "%s\n",(char*)data_unused);
 
 	return len;
 }
@@ -82,7 +84,7 @@ int get_IpInfo(char *page, char **start, off_t off, int count, int *eof, void *d
 {
 
 	char len;
-	len = sprintf(page, "IpInfo is %s\n",(char*)data_unused);
+	len = sprintf(page, "%s\n",(char*)data_unused);
 
 	return len;
 }
@@ -109,7 +111,7 @@ int get_AfterMasterIp(char *page, char **start, off_t off, int count, int *eof, 
 {
 
 	char len;
-	len = sprintf(page, "AfterMasterIp is %s\n",(char*)data_unused);
+	len = sprintf(page, "%s\n",(char*)data_unused);
 
 	return len;
 }
@@ -136,7 +138,7 @@ int get_MyLocation(char *page, char **start, off_t off, int count, int *eof, voi
 {
 
 	char len;
-	len = sprintf(page, "MyLocation is %s\n",(char*)data_unused);
+	len = sprintf(page, "%s\n",(char*)data_unused);
 
 	return len;
 }
@@ -163,7 +165,7 @@ int get_MasterLocation(char *page, char **start, off_t off, int count, int *eof,
 {
 
 	char len;
-	len = sprintf(page, "MasterLocation is %s\n",(char*)data_unused);
+	len = sprintf(page, "%s\n",(char*)data_unused);
 
 	return len;
 }
@@ -190,7 +192,7 @@ int get_DeviceAttached(char *page, char **start, off_t off, int count, int *eof,
 {
 
 	char len;
-	len = sprintf(page, "DeviceAttached is %s\n",(char*)data_unused);
+	len = sprintf(page, "%s\n",(char*)data_unused);
 
 	return len;
 }

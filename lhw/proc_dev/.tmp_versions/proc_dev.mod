@@ -1,2 +1,2 @@
-/theMeal/lhw/proc_dev/proc_dev.ko
-/theMeal/lhw/proc_dev/proc_dev.o
+/tftpboot/myrootdir/MY_PROJECT/proc_dev/proc_dev.ko
+/tftpboot/myrootdir/MY_PROJECT/proc_dev/proc_dev.o
