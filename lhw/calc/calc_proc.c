@@ -79,7 +79,8 @@ int main(void)
 	}
 //	printf("DeviceAttached Set Start!!\n");
 
-	execl("./UI","UI",0);
+	 execl("./Master","MasterIpSet",0);
+//execl("./UI","UI",0);
 
 	/*
 if( res == (char)0)
