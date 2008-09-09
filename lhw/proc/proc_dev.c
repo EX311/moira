@@ -30,6 +30,7 @@ struct proc_dir_entry *AfterMasterIp3_fp=NULL;
 struct proc_dir_entry *MyLocation_fp=NULL;
 struct proc_dir_entry *MasterLocation_fp=NULL;
 struct proc_dir_entry *DeviceAttached_fp=NULL;
+struct proc_dir_entry *Senser_fp=NULL;
 
 char IsConnect_data[DATASIZE]={0,};
 char IpInfo_data[DATASIZE]={0,};
@@ -45,6 +46,7 @@ char AfterMasterIp3_data[DATASIZE]={0,};
 char MyLocation_data[DATASIZE]={0,};
 char MasterLocation_data[DATASIZE]={0,};
 char DeviceAttached_data[DATASIZE]={0,};
+char Senser_data[DATASIZE]={0,};
 // page: 저장할 페이지
 // off: 정보기록 시작위치
 // count: 읽어올 바이트수
@@ -314,6 +316,15 @@ int board_status_init(void)
 		DeviceAttached_fp->write_proc=set_DeviceAttached;
 	}
 
+	Senser_fp = create_proc_entry("Senser", S_IFREG | S_IRWXU, board_status_fp);
+	if(Senser_fp)
+	{
+	 	Senser_fp->data=Senser_data;
+		Senser_fp->read_proc=get_DeviceAttached;
+		Senser_fp->write_proc=set_DeviceAttached;
+	}
+
+
 	return 0;
 }
 
@@ -335,6 +346,7 @@ remove_proc_entry("DeviceAttached",board_status_fp);
 remove_proc_entry("MasterLocation",board_status_fp);
 remove_proc_entry("MyLocation",board_status_fp);
 remove_proc_entry("IsConnect",board_status_fp);
+remove_proc_entry("Senser",board_status_fp);
 remove_proc_entry("board_status",0);
 
 }
