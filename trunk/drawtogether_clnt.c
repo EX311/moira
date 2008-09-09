@@ -156,8 +156,6 @@ void reset_ipaddr(void)
 	char temp_ip[4] = {0,};
 	char base_ip[16] = "192.168.123.";
 
-	num = get_DeviceAttached();
-	numofdevice = 0;
 
 	fd = open("/root/config_MyIp", O_RDONLY);
 	if (fd < 0) {
@@ -173,37 +171,33 @@ void reset_ipaddr(void)
 #ifdef DEBUG
 	fprintf(stderr, "MyIP: %s\n", myip);
 #endif	
-	if(num)//if there's no device attached we don't need to do this.
+	for (i=0; i<VFB_MAX; i++) 
 	{
-		for (i=0; i<VFB_MAX; i++) 
-		{
-			ret = get_IpInfo(i, temp_ip);
-			temp_ip[ret] = '\0';
+		ret = get_IpInfo(i, temp_ip);
+		temp_ip[ret] = '\0';
 
-			temp = atoi(temp_ip);	
-			if(!temp)
-			{
-				numofdevice++;
-				isconnected[i] = 1;
-			}
-			else
-			{
-				//do sth because we need to know who's connected who's not.
-				isconnected[i] = 0;
-			}	
-			if (strncmp(temp_ip, myip, 3) == 0) {
-				mylocation = i;
-				isconnected[i] = 0; //we shouldn't try to connect to our own ip.
-				//continue;
-			}
-			strncpy(temp_base_ip, base_ip, 12);
-			temp_base_ip[12] = '\0';
-			strncat(temp_base_ip, temp_ip, 3);
-			strcpy(ipaddr[i], temp_base_ip);
-#ifdef DEBUG
-			fprintf(stderr, "[%2d] %s\n", i, ipaddr[i]);
-#endif
+		temp = atoi(temp_ip);	
+		if(!temp)
+		{
+			isconnected[i] = 1;
 		}
+		else
+		{
+			//do sth because we need to know who's connected who's not.
+			isconnected[i] = 0;
+		}	
+		if (strncmp(temp_ip, myip, 3) == 0) {
+			mylocation = i;
+			isconnected[i] = 0; //we shouldn't try to connect to our own ip.
+			//continue;
+		}
+		strncpy(temp_base_ip, base_ip, 12);
+		temp_base_ip[12] = '\0';
+		strncat(temp_base_ip, temp_ip, 3);
+		strcpy(ipaddr[i], temp_base_ip);
+#ifdef DEBUG
+		fprintf(stderr, "[%2d] %s\n", i, ipaddr[i]);
+#endif
 	}
 
 	if (fd > 0)
@@ -293,7 +287,12 @@ int main()
 	for(i=0;i<VFB_MAX;i++)
 	{
 		if(isconnected[i])
+		{
 			strcpy(serv_addr[i],ipaddr[i]);
+#ifdef DEBUg
+			printf("serv_addr[i] : %s ipaddr[i] : %s\n",serv_addr[i],ipaddr[i]);
+#endif
+		}
 	}
 
 	//need to connect to server
