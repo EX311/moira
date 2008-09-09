@@ -227,7 +227,6 @@ void set_bgimage(void)
 	if (chat_count > 0 || no_count > 10)
 		return;
 
-	printf("DAMN!!!\n");
 	bh = bmp_open(bg_image);
 	if (bh == NULL) {
 		perror("bmp_open");
