@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-
 int main(void)
 {
 	char IsConnect;
@@ -81,7 +80,8 @@ int main(void)
 	}
 //	printf("DeviceAttached Set Start!!\n");
 
-	 execl("./Master","MasterIpSet",0);
+	execl("/root/Master","MasterIpSet",0);
+	 
 //	 child_pid=wait(&stat_val);
 //execl("./UI","UI",0);
 

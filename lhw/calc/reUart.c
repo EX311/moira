@@ -15,7 +15,7 @@
 #define DISCON_MSG_R 67
 
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define FIRST 16
 #define SECOND 8
@@ -23,6 +23,7 @@
 #define FOURTH 2
 #define FIFTH 1
 
+/*
 void cal_process_start()//(int sig)
 {
 //	printf("cal process start\n");
@@ -39,7 +40,8 @@ void cal_process_start()//(int sig)
 
 		case 0:
 //			printf("fork calc start\n");
-				execl("./calc_proc","calc_proc",0);
+//				execl("./calc_proc","calc_proc",0);
+			calc_proc();
 //			printf("fork calc end\n");
 			break;
 			
@@ -49,6 +51,12 @@ void cal_process_start()//(int sig)
 	
 	}
 
+}
+*/
+
+void cal_process_start(void)
+{
+	system("/root/calc_proc");
 }
 
 int main( void)
@@ -105,7 +113,7 @@ initPoll(fd);
 					memset(buf,0,sizeof(buf));
 
 					cnt = read( fd, buf, sizeof(buf));
-					printf("cnt=%d",cnt);
+//					printf("cnt=%d",cnt);
 					switch(buf[0])
 					{
 						case 's': flag=SENSER_DATA;
@@ -320,7 +328,7 @@ initPoll(fd);
 */
 					if(flag==SENSER_DATA)
 					{
-							printf("senser_data=%s\n",s_rxdata);
+//							printf("senser_data=%s\n",s_rxdata);
 							
 						senser=atoi(s_rxdata);
 						set_Senser(senser);

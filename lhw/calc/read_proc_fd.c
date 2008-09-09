@@ -1,9 +1,8 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include "read_proc.h"
-
-#define DEBUG 0
 
 int IsConnect_fd_return(void)
 {
@@ -141,7 +140,6 @@ int DeviceAttached_fd_return(void)
 	}
 	return fd;
 }
-
 int Senser_fd_return(void)
 {
 	int    fd;
@@ -155,6 +153,7 @@ int Senser_fd_return(void)
 }
 
 
+/*
 #if DEBUG 
 
 int main(void)
@@ -163,7 +162,7 @@ int main(void)
 	char buf[1024];
 	int cnt;
 	int i;
-	/*
+	/
 	 * we need a library function to find out how many devices are attached with our device by calculating buf.
 	 * buf needs to be converted to integer first.
 	 * then we should convert decimal to binary to get this(1111 or 0001 ... 0101 )or we could just calculate.
@@ -172,7 +171,7 @@ int main(void)
 	 * 0010 is top side.
 	 * 0100 is right side.
 	 * 1000 is bottom side.
-	 */
+	 *
 	fd=IsConnect_fd_return();
 	cnt = read(fd,buf,sizeof(buf));
 	printf("%s\n",buf);
@@ -204,3 +203,4 @@ int main(void)
 	printf("%s\n",buf);
 }
 #endif
+*/

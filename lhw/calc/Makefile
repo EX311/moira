@@ -1,11 +1,12 @@
 CC = arm-linux-gcc
 //CC = gcc
 all:
-	@make Master
 	@make reUart
+	@make Master
 	@make random_write
 	@make calc_proc
 	@make UI
+
 Master : MasterIpSet.c read_proc_fd.c read_proc_function.c
 	$(CC) -o $@ $^
 
@@ -25,6 +26,8 @@ calc_proc : read_proc_fd.c read_proc_function.c calc_proc.c
 UI : read_proc_fd.c read_proc_function.c start_UI.c 
 	$(CC) -o $@ $^ 
 
+install:
+	cp -rf Master calc_proc reUart random_write /tftpboot/myrootdir/root/
 clean : 
 	@rm -rf *.o read_proc
 	@rm -rf Master

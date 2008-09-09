@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
-#define DEBUG 0
 
 char get_IsConnect(void)
 {
