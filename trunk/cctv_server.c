@@ -154,8 +154,9 @@ int main(int argc, char *argv[])
 				if(count == myfb->fbfix.smem_len)
 				{
 				
-				printf(" debug :: send data  \n" );
-				fb_send(clnt_sock, vfb_list[0], myfb->fbfix.smem_len);
+				ret = fb_send(clnt_sock, vfb_list[0], myfb->fbfix.smem_len);
+				printf(" debug :: send data - %d \n", ret );
+
 				count = 0 ;
 					show_vfb(vfb_list[0]);
 				}
