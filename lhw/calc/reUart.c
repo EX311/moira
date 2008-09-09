@@ -9,7 +9,11 @@
 #define RX_DATA_L 8
 #define RX_DATA_R 16
 #define SENSER_DATA 32
-#define DISCON_MSG 64
+#define DISCON_MSG_T 64
+#define DISCON_MSG_B 65
+#define DISCON_MSG_L 66
+#define DISCON_MSG_R 67
+
 
 #define DEBUG 1
 
@@ -43,29 +47,6 @@ void cal_process_start()//(int sig)
 	}
 
 }
-
-void disconnect()
-{
-	pid_t pid;
-	pid=fork();
-		switch(pid)
-	{
-		case -1:
-			printf("disconnect process fork fail\n");
-			break;
-
-		case 0:
-				execl("./clear_proc.sh","clear_proc",0);
-			break;
-			
-		default:
-			break;
-	
-	}
-
-
-}
-
 
 int main( void)
 {  
@@ -120,14 +101,28 @@ initPoll(fd);
 					memset(buf,0,sizeof(buf));
 
 					cnt = read( fd, buf, sizeof(buf));
+					printf("cnt=%d",cnt);
 					switch(buf[0])
 					{
 						case 's': flag=SENSER_DATA;
 											s_rxdata[0]=buf[1];	s_rxdata[1]=buf[2];	s_rxdata[2]=buf[3];
 											break;
-						case 'd':	flag=DISCON_MSG;
-											disconnect();
+						case 'w':	flag=DISCON_MSG_T;
+											system("echo "" > /proc/board_status/IpInfo/IpInfo0");
+											printf("Top disconnect\n");
 											break;
+						case 'a':	flag=DISCON_MSG_L;
+											system("echo "" > /proc/board_status/IpInfo/IpInfo1");
+											printf("Left disconnect\n");
+										break;
+						case 'f':	flag=DISCON_MSG_R;
+											system("echo "" > /proc/board_status/IpInfo/IpInfo3");
+											printf("Right disconnect\n");
+								break;
+						case 'x':	flag=DISCON_MSG_B;
+											system("echo "" > /proc/board_status/IpInfo/IpInfo2");
+										printf("Bottom disconnect\n");
+							break;
 						
 						case 't':
 										flag=RX_DATA_T;
@@ -299,8 +294,15 @@ initPoll(fd);
 */
 					if(flag==SENSER_DATA)
 							printf("senser_data=%s\n",s_rxdata);
-					if(flag==DISCON_MSG)
-							printf("disconnect\n");
+/*					if(flag==DISCON_MSG_T)
+							printf("Top disconnect\n");
+					if(flag==DISCON_MSG_B)
+							printf("Bottom disconnect\n");
+					if(flag==DISCON_MSG_R)
+							printf("Right disconnect\n");
+					if(flag==DISCON_MSG_L)
+							printf("Left disconnect\n");
+*/
 
 //					if(t_cnt==5 || b_cnt==5 || l_cnt==5 || r_cnt==5 )
 					if( t_flag==31 || b_flag==31 || l_flag==31 || r_flag==31 )
@@ -418,7 +420,7 @@ initPoll(fd);
 						IsConnectBuf=get_IsConnect();
 						IsConnectBuf |= 1;
 						set_IsConnect(IsConnectBuf);
-//						cal_process_start();
+						cal_process_start();
 //						kill(0,SIGUSR1);
 					}
 
@@ -428,7 +430,7 @@ initPoll(fd);
 						IsConnectBuf=get_IsConnect();
 						IsConnectBuf |= 4;
 						set_IsConnect(IsConnectBuf);
-//						cal_process_start();
+						cal_process_start();
 //						kill(0,SIGUSR1);
 					}
 
@@ -438,7 +440,7 @@ initPoll(fd);
 						IsConnectBuf=get_IsConnect();
 						IsConnectBuf |= 2;
 						set_IsConnect(IsConnectBuf);
-//						cal_process_start();
+						cal_process_start();
 //						kill(0,SIGUSR1);
 					}
 
@@ -448,7 +450,7 @@ initPoll(fd);
 						IsConnectBuf=get_IsConnect();
 						IsConnectBuf |= 8;
 						set_IsConnect(IsConnectBuf);
-//						cal_process_start();
+						cal_process_start();
 //						kill(0,SIGUSR1);
 					}
 

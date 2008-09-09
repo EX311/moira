@@ -12,6 +12,10 @@ Master : MasterIpSet.c read_proc_fd.c read_proc_function.c
 reUart : reUart.c read_proc_fd.c read_proc_function.c
 	$(CC) -o $@ $^
 
+reUart_det : reUart_with_detect.c read_proc_fd.c read_proc_function.c
+		$(CC) -o $@ $^
+
+
 random_write : random_write.c read_proc_fd.c read_proc_function.c
 	$(CC) -o $@ $^ 
 
