@@ -16,7 +16,7 @@
 #include <sys/socket.h>
 
 #include "oo.h"
-#include "read_proc.h"
+//#include "read_proc.h"
 
 extern struct myfb_info *myfb;
 //extern char ipaddr[VFB_MAX][16];

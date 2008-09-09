@@ -21,7 +21,7 @@
 
 #include "oo.h"
 
-#include "/home/work/source/rebis-2.6/drivers/media/video/userapp.h" // linux source tree for rebis
+#include "/home/amon/work/source/rebis-2.6/drivers/media/video/userapp.h" // linux source tree for rebis
 
 #define CODEC_NAME  "/dev/preview"
 #define FB_NAME    "/dev/fb0" 
@@ -158,10 +158,10 @@ int main(int argc, char *argv[])
 				printf(" debug :: send data - %d \n", ret );
 
 				count = 0 ;
-					show_vfb(vfb_list[0]);
+				//	show_vfb(vfb_list[0]);
 				}
 				
-			}
+			
 
 		}while(1);
 
