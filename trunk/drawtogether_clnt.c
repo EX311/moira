@@ -173,18 +173,18 @@ void reset_ipaddr(void)
 #endif	
 	for (i=0; i<VFB_MAX; i++) 
 	{
-		ret = get_IpInfo(i, temp_ip);
+		ret = get_AfterMasterIp(i, temp_ip);
 		temp_ip[ret] = '\0';
 
 		temp = atoi(temp_ip);	
 		if(!temp)
 		{
-			isconnected[i] = 1;
+			isconnected[i] = 0;
 		}
 		else
 		{
 			//do sth because we need to know who's connected who's not.
-			isconnected[i] = 0;
+			isconnected[i] = 1;
 		}	
 		if (strncmp(temp_ip, myip, 3) == 0) {
 			mylocation = i;
@@ -346,8 +346,9 @@ int main()
 						printf("old fbuffer saved!!\n");
 #endif
 						for(i=0;i<VFB_MAX;i++)
+						{
 							if(isconnected[i]){
-								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text));
+								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text)+1);
 								if(ret<=0)
 								{
 									perror("write");
@@ -360,6 +361,7 @@ int main()
 								}
 #endif
 							}
+						}
 						//now we need to read datas from others.
 						for(i=0;i<VFB_MAX;i++)
 						{
@@ -409,7 +411,7 @@ int main()
 						for(i=0;i<VFB_MAX;i++)
 						{
 							if(isconnected[i]){
-								ret = write(serv_sock,buttons[mode].text,strlen(buttons[mode].text));
+								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text));
 								if(ret<=0)
 								{
 									perror("write");
@@ -445,6 +447,7 @@ int main()
 									perror("write");
 									exit(1);
 								}
+								close(serv_sock[i]);
 							}
 						}
 						put_string_center (xres/2, yres/2,   "Bye~!!", 1);

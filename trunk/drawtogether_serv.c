@@ -218,12 +218,12 @@ void reset_ipaddr(void)
 		temp = atoi(temp_ip);	
 		if(!temp)
 		{
-			isconnected[i] = 1;
+			isconnected[i] = 0;
 		}
 		else
 		{
 			//do sth because we need to know who's connected who's not.
-			isconnected[i] = 0;
+			isconnected[i] = 1;
 		}	
 		if (strncmp(temp_ip, myip, 3) == 0) {
 			mylocation = i;
