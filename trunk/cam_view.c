@@ -261,14 +261,11 @@ void send_data(func)
 	int i ;
 	for (i=1; i<VFB_MAX; i++) 
 	{
-		/*   change ->  start i = 0
-		 *   if ( get_MasterLocation() == i )
-		 *    continue;
-		 *
-		 */
-
-
-		if(func ==2)
+		//   change ->  start i = 0
+		   if ( get_MasterLocation() == i )
+		      continue;
+		
+		 if(func ==2)
 			fb_send(sock[i], vfb_list[0], myfb->fbfix.smem_len);
 		else if (func ==3)
 		{
