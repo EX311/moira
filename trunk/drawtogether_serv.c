@@ -212,13 +212,12 @@ void reset_ipaddr(void)
 #endif	
 	for (i=0; i<VFB_MAX; i++) 
 	{
-		ret = get_IpInfo(i, temp_ip);
+		ret = get_AfterMasterIp(i, temp_ip);
 		temp_ip[ret] = '\0';
 
 		temp = atoi(temp_ip);	
 		if(!temp)
 		{
-			numofdevice++;
 			isconnected[i] = 1;
 		}
 		else
