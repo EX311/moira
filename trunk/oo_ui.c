@@ -13,12 +13,13 @@ extern "C" {
 
 #include "tslib.h"
 #include "oo.h"
+#include "read_proc.h"
 
 #define	MAX_CMD		6
 #define	ICONSIZE	48
 
 struct icon {
-	int x, y, w, h;
+	int x, y, w, h, mode;
 	char *name;
 	struct color color;
 	struct icon *next;
@@ -33,15 +34,15 @@ struct cmd_list {
 extern struct myfb_info *myfb;
 extern unsigned short *vfb_list[VFB_MAX];
 
-int icon_count, chat_count = 0;
+int icon_count, no_count, chat_count = 0;
 char *file_ui = "oo_ui.lua";
 char bg_image[25];
-struct color bgcolor;
+struct color bgcolor, blockcolor;
 struct icon *head = NULL;
 struct cmd_list *cmdlist = NULL;
 struct color white = {0xff, 0xff, 0xff};
 
-void insert_icon(int x, int y, char *name, struct color color)
+void insert_icon(int x, int y, int mode, char *name, struct color color)
 {
 	struct icon *temp;
 	struct icon *p_temp = head;
@@ -51,6 +52,7 @@ void insert_icon(int x, int y, char *name, struct color color)
 		temp->y = y;
 		temp->w = ICONSIZE;
 		temp->h = ICONSIZE;
+		temp->mode = mode;
 		temp->color = color;
 		temp->name = (char *)malloc(strlen(name)+1);
 		memcpy(temp->name, name, strlen(name));
@@ -66,6 +68,7 @@ void insert_icon(int x, int y, char *name, struct color color)
 		temp->y = y;
 		temp->w = ICONSIZE;
 		temp->h = ICONSIZE;
+		temp->mode = mode;
 		temp->color = color;
 		temp->name = (char *)malloc(strlen(name)+1);
 		memcpy(temp->name, name, strlen(name));
@@ -106,7 +109,7 @@ int lua_set_icon_count(lua_State *L)
 int lua_set_icon_info(lua_State *L)
 {
 	lua_gettop(L);
-	insert_icon((int)lua_tonumber(L,1), (int)lua_tonumber(L,2), (char *)lua_tostring(L,3), reveres_pixel((unsigned short)lua_tonumber(L,4)));
+	insert_icon((int)lua_tonumber(L,1), (int)lua_tonumber(L,2), (int)lua_tonumber(L,3), (char *)lua_tostring(L,4), reveres_pixel((unsigned short)lua_tonumber(L,5)));
 	return 0;
 }
 
@@ -180,28 +183,60 @@ int lua_set_bgcolor(lua_State *L)
 	bgcolor.r = (unsigned short)lua_tonumber(L,1);
 	bgcolor.g = (unsigned short)lua_tonumber(L,2);
 	bgcolor.b = (unsigned short)lua_tonumber(L,3);
+
+	blockcolor.r = (unsigned short)lua_tonumber(L,4);
+	blockcolor.g = (unsigned short)lua_tonumber(L,5);
+	blockcolor.b = (unsigned short)lua_tonumber(L,6);
 #ifdef DEBUG
 	fprintf(stderr, "BG COLOR : #%x%x%x\n", bgcolor.r, bgcolor.g, bgcolor.b);
+	fprintf(stderr, "Block COLOR : #%x%x%x\n", blockcolor.r, blockcolor.g, blockcolor.b);
 #endif
 	return 0;
 }
 
+void draw_block(int x, int y)
+{
+	drow_rect(x, y, x+9, y+9, blockcolor);
+}
+
+void draw_icon(struct icon *icon)
+{
+	int i, j;
+	bmphandle_t bh;
+
+	if (icon->mode) {
+		bh = bmp_open(icon->name);
+		if (bh == NULL) {
+			perror("bmp_open");
+			return;
+		}
+//		buf_bmp(bh, icon->x, icon->y);
+		for (i=icon->y; i<icon->y+bmp_height(bh); i++)
+			for (j=icon->x; j<icon->x+bmp_width(bh); j++)
+				*(myfb->fb + i*myfb->fbvar.xres +j) = makepixel(bmp_getpixel(bh, j-icon->x, i-icon->y));
+
+		bmp_close(bh);
+	} else {
+		drow_rect(icon->x, icon->y, icon->x + icon->w, icon->y + icon->h, icon->color);
+		put_string_center(icon->x + icon->w/2, icon->y + icon->h/2, icon->name, icon->color);
+	}
+}
+
 void set_bgimage(void)
 {
-	if (chat_count > 0)
+	if (chat_count > 0 || no_count > 10)
 		return;
 	bmphandle_t bh;
 
-	set_vfb_buf(1);
 	bh = bmp_open(bg_image);
 	if (bh == NULL) {
 		perror("bmp_open");
 		return;
 	}
 	buf_bmp(bh, 0, 0);
-	show_vfb(vfb_list[0]);
 	bmp_close(bh);
-	free_vfb_buf(1);
+
+	show_vfb(vfb_list[0]);
 }
 
 int lua_set_bgimage(lua_State *L)
@@ -215,12 +250,6 @@ int lua_set_bgimage(lua_State *L)
 	return 0;
 }
 
-void draw_icon(struct icon *icon)
-{
-	drow_rect(icon->x, icon->y, icon->x + icon->w, icon->y + icon->h, icon->color);
-	put_string_center(icon->x + icon->w/2, icon->y + icon->h/2, icon->name, icon->color);
-}
-
 int icon_handle(struct icon *icon, struct ts_sample *samp)
 {
 	int inside = (samp->x >= icon->x) && (samp->y >= icon->y) && (samp->x < icon->x + icon->w) && (samp->y < icon->y + icon->h);
@@ -229,6 +258,7 @@ int icon_handle(struct icon *icon, struct ts_sample *samp)
 			chat_count++;
 			return 1;
 		} else {
+			no_count++;
 			return 0;
 		}
 	}
@@ -258,6 +288,7 @@ int main(int argc, char *argv[])
 	lua_State *L;
 
 	myfb = myfb_open();
+	set_vfb_buf(1);
 	ts = ts_init();
 
 	L = luaL_newstate();
@@ -273,13 +304,33 @@ int main(int argc, char *argv[])
 	lua_close(L);
 
 	while (1) {
-		int pid, state = 0;
+		int c, da_count, old_da_count, pid, state = 0;
 		struct ts_sample samp;
 		struct icon *i;
 		struct cmd_list *j;
 
+		da_count = get_DeviceAttached();
+		if (!old_da_count)
+			old_da_count = da_count;
+		else {
+			if (old_da_count != da_count) {
+				clear_screen();
+				put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2 - 10, "Attached Info is changed!", white);
+				put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2 + 10, "Touch the screen!", white);
+				old_da_count = da_count;
+				ret = ts_read(ts, &samp, 1);
+				continue;
+			}
+		}
+
+		if (!da_count)
+			da_count = 1;
+
 		set_bgimage();
 		set_bgcolor();
+		for (c=1; c<=da_count; c++)
+			draw_block(myfb->fbvar.xres-12*c, 3);
+		
 		if (head == NULL) {
 			put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, "Sorry, No Apps. registered!", white);
 #ifdef DEBUG
@@ -322,6 +373,7 @@ int main(int argc, char *argv[])
 				} else {
 					sleep(1);
 					wait(&state);
+					no_count = 0;
 #ifdef DEBUG
 					fprintf(stderr, " *** End of CHILD! ***\n");
 #endif
@@ -336,6 +388,7 @@ int main(int argc, char *argv[])
 	free_icon();
 	free_cmd();
 	ts_close(ts);
+	free_vfb_buf(1);
 	myfb_close();
 	return 0;
 }

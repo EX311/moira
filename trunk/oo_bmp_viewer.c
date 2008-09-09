@@ -116,7 +116,7 @@ void find_bmp(char *dirname)
 			put_string(96, i, dirp->d_name, white);
 			i += 30;
 			count++;
-			if (count >= 10)
+			if (count >= 7)
 				break;
 		}
 	}
