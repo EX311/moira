@@ -142,6 +142,19 @@ int DeviceAttached_fd_return(void)
 	return fd;
 }
 
+int Senser_fd_return(void)
+{
+	int    fd;
+	fd = open( "/proc/board_status/Senser", O_RDWR | O_NOCTTY | O_NONBLOCK );    
+	if ( 0 > fd)
+	{        
+		printf("/proc/board_status/Senser open errorn");
+		return -1;
+	}
+	return fd;
+}
+
+
 #if DEBUG 
 
 int main(void)

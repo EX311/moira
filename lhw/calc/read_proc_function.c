@@ -251,3 +251,41 @@ int set_DeviceAttached(int DeviceAttached)
 
 }
 
+int get_Senser(void)
+{
+	int fd;
+	int cnt;
+	char buf[3];
+	int i;
+	int res;
+	fd=Senser_fd_return();
+	cnt = read(fd,buf,sizeof(buf));
+	#if DEBUG
+	printf("get_Senser return value = %c\n",buf);
+#endif
+	res=atoi(buf);
+
+	close(fd);
+	return res;
+
+}
+
+int set_Senser(int senser)
+{
+	int fd;
+	char buf[3];
+	int cnt;
+	int i;
+
+	sprintf(buf,"%d",senser);
+	fd=Senser_fd_return();
+	write(fd,buf,sizeof(buf));
+#if DEBUG
+		printf("set_Senser set value = %c\n",buf);
+#endif
+	close(fd);
+
+	return 1;
+
+}
+

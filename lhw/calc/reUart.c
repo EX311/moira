@@ -27,6 +27,8 @@ void cal_process_start()//(int sig)
 {
 //	printf("cal process start\n");
 	pid_t pid;
+	int stat_val;
+	pid_t child_pid;
 
 	pid=fork();
 	switch(pid)
@@ -42,7 +44,8 @@ void cal_process_start()//(int sig)
 			break;
 			
 		default:
-			break;
+		 child_pid=wait(&stat_val);
+		break;
 	
 	}
 
@@ -69,6 +72,7 @@ int main( void)
 		char 	l_rxdata[15]={0,};
 		char 	r_rxdata[15]={0,};
 
+		int 	senser=0;
 		int 	t_cnt=0;
 		int 	b_cnt=0;
 		int 	l_cnt=0;
@@ -293,7 +297,12 @@ initPoll(fd);
 						{
 */
 					if(flag==SENSER_DATA)
+					{
 							printf("senser_data=%s\n",s_rxdata);
+							
+						senser=atoi(s_rxdata);
+						set_Senser(senser);
+					}
 /*					if(flag==DISCON_MSG_T)
 							printf("Top disconnect\n");
 					if(flag==DISCON_MSG_B)

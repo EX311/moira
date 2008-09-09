@@ -107,3 +107,7 @@ int set_DeviceAttached(int DeviceAttached);
 //							 Others (FALSE)
 //***********************************************
 
+int get_Senser(void);
+
+int set_Senser(int senser);
+

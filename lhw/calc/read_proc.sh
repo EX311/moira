@@ -10,4 +10,4 @@ cat /proc/board_status/AfterMasterIp/AfterMasterIp3
 cat /proc/board_status/MyLocation
 cat /proc/board_status/MasterLocation
 cat /proc/board_status/DeviceAttached
-
+cat /proc/board_status/Senser

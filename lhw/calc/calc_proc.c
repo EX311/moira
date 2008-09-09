@@ -5,14 +5,16 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
+#include <sys/wait.h>
 
 
 int main(void)
 {
 	char IsConnect;
+//	int stat_val;
+//	pid_t child_pid;
 	IsConnect = get_IsConnect();
-
+	
 //	printf("MyLocation Set Start!!\n");
 	switch(IsConnect)
 	{
@@ -80,6 +82,7 @@ int main(void)
 //	printf("DeviceAttached Set Start!!\n");
 
 	 execl("./Master","MasterIpSet",0);
+//	 child_pid=wait(&stat_val);
 //execl("./UI","UI",0);
 
 	/*
