@@ -34,10 +34,8 @@ char *tsdevice = "/dev/ts0";
 struct ts_sample samp;
 
 struct myfb_info* myfb ;
-//char *taget_ip ;
-char *ipaddr[VFB_MAX] = {"192.168.123.182","192.168.123.172","192.168.123.157","192.168.88.55"};
-
-//static FILE * tty_fp;
+#define CAM_MAX 3
+char *ipaddr[CAM_MAX] = {"192.168.123.191","192.168.123.192","192.168.123.193"};
 
 struct icon {
 	int x, y, w, h;
@@ -210,13 +208,10 @@ int main(void)
 	while( event ==0)
 	{
 		sleep(1);
-	//	printf("inout ready\n");	
 	}
 
 	while(1)
 	{
-
-//		printf(" main loop \n");
 
 		if (event == 9)
 		{
