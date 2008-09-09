@@ -232,9 +232,8 @@ int main()
 	unsigned int merge;
 	unsigned int mode = 0;
 	unsigned char *buff,*old,*temp;
-	//unsigned short temp;
+
 	int serv_sock[VFB_MAX];
-	//char serv_addr[] = "192.168.77.77";
 	char serv_addr[VFB_MAX][16];
 	char myip[16];
 
@@ -411,7 +410,7 @@ int main()
 						for(i=0;i<VFB_MAX;i++)
 						{
 							if(isconnected[i]){
-								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text));
+								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text)+1);
 								if(ret<=0)
 								{
 									perror("write");
@@ -441,7 +440,7 @@ int main()
 						{
 							if(isconnected[i])
 							{
-								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text));
+								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text)+1);
 								if(ret<=0)
 								{
 									perror("write");

@@ -383,12 +383,14 @@ int main()
 #ifdef DEBUG
 			printf("buff = %s\n",buff);
 #endif
+			
 			if(!strcmp(buff,"Merge"))
 			{
 				//merge mode
 				buff[0] = '\0';
 #ifdef DEBUG
 				printf("Merge mode on\n");
+				printf("is buff cleared ? : %s\n",buff);
 #endif
 				ret = write(clnt_sock,fbuffer,fix.smem_len);
 
@@ -410,6 +412,7 @@ int main()
 				buff[0] = '\0';
 #ifdef DEBUG
 				printf("Split mode on\n");
+				printf("is buff cleared ? : %s\n",buff);
 #endif
 			}
 			else if(!strcmp(buff,"X"))
@@ -417,8 +420,14 @@ int main()
 				buff[0] = '\0';
 #ifdef DEBUG
 				printf("Exit\n");
+				printf("is buff cleared ? : %s\n",buff);
 #endif
 				break;
+			}
+			else
+			{
+				buff[0] = '\0';
+				continue;
 			}
 
 		}
