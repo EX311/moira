@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
 
 		da_count = get_DeviceAttached();
 		if (!da_count)
-			da_count = 1;
+			da_count = 0;
 
 		if (!old_da_count)
 			old_da_count = da_count;
@@ -341,8 +341,8 @@ int main(int argc, char *argv[])
 
 		set_bgimage();
 		set_bgcolor();
-		for (c=1; c<=da_count; c++)
-			draw_block(myfb->fbvar.xres-12*c, 3);
+		for (c=0; c<=da_count; c++)
+			draw_block(myfb->fbvar.xres-12*c+12, 3);
 		
 		if (head == NULL) {
 			put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, "Sorry, No Apps. registered!", white);
