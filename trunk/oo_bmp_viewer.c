@@ -26,7 +26,7 @@ struct bmplist {
 	char name[30];
 };
 
-int quit = 1, check = 0;
+int quit = 1;
 int x = 0;
 int y = 0;
 int ts_sock[VFB_MAX] = {-1,-1,-1,-1};
@@ -134,7 +134,7 @@ void find_bmp(char *dirname)
 
 		for (i=0; i<count; i++) {
 			if (list_handle(&list[i], &samp) > 0) {
-				if (chat < 20) {
+				if (chat < 30) {
 					chat++;
 					continue;
 				}
@@ -231,7 +231,6 @@ int main(int argc, char *argv[])
 	}
 	/* main loop */
 	while (quit != 0) {
-
 		clear_vfb_buf(VFB_MAX);
 		buf_bmp(bh, x, y);
 		for (i=0; i<VFB_MAX; i++) {
@@ -240,8 +239,6 @@ int main(int argc, char *argv[])
 			}
 		}
 		show_vfb(vfb_list[mylocation]);
-
-		check = 1;
 	}
 
 	for (i=0; i<VFB_MAX; i++) {
@@ -322,8 +319,6 @@ void *ts_net_read(void *arg)
 		} else if (sock == ts_sock[3]) {
 			x = 320; y = 240;
 		}
-
-		check = 1;
 	}
 
 	shutdown(sock, SHUT_RDWR);
@@ -367,7 +362,6 @@ void *ts_local_read(void *arg)
 #endif
 
 		x = 0; y = 0;
-		check = 1;
 		if (samp.x > 300) {
 			put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, bye_msg, white);
 			break;

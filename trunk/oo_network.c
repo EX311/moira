@@ -206,7 +206,7 @@ void insert_ipaddr(void)
 	fprintf(stderr, "MyIP: %s\n", myip);
 #endif
 	for (i=0; i<VFB_MAX; i++) {
-		ret = get_IpInfo(i, temp_ip);
+		ret = get_AfterMasterIp(i, temp_ip);
 		temp_ip[ret] = '\0';
 
 		if (strncmp(temp_ip, myip, 3) == 0) {

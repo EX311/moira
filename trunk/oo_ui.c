@@ -36,7 +36,7 @@ extern unsigned short *vfb_list[VFB_MAX];
 
 int icon_count, no_count, chat_count = 0;
 char *file_ui = "oo_ui.lua";
-char bg_image[25];
+char bg_image[30] = {0,};
 struct color bgcolor, blockcolor;
 struct icon *head = NULL;
 struct cmd_list *cmdlist = NULL;
@@ -174,7 +174,7 @@ int lua_set_cmd_list(lua_State *L)
 
 void set_bgcolor(void)
 {
-	memset(myfb->fb, makepixel(bgcolor), myfb->fbvar.xres*15);
+	memset(myfb->fb, makepixel(bgcolor), myfb->fbvar.xres*20);
 }
 
 int lua_set_bgcolor(lua_State *L)
@@ -210,7 +210,6 @@ void draw_icon(struct icon *icon)
 			perror("bmp_open");
 			return;
 		}
-//		buf_bmp(bh, icon->x, icon->y);
 		for (i=icon->y; i<icon->y+bmp_height(bh); i++)
 			for (j=icon->x; j<icon->x+bmp_width(bh); j++)
 				*(myfb->fb + i*myfb->fbvar.xres +j) = makepixel(bmp_getpixel(bh, j-icon->x, i-icon->y));
@@ -224,15 +223,25 @@ void draw_icon(struct icon *icon)
 
 void set_bgimage(void)
 {
+	bmphandle_t bh;
 	if (chat_count > 0 || no_count > 10)
 		return;
-	bmphandle_t bh;
 
+	printf("DAMN!!!\n");
 	bh = bmp_open(bg_image);
 	if (bh == NULL) {
 		perror("bmp_open");
+		clear_screen();	
 		return;
 	}
+
+	if (bmp_width(bh) > 320 || bmp_height(bh) > 240) {
+		clear_screen();
+		fprintf(stderr, "bmp size is too large: %d x %d\n", bmp_width(bh), bmp_height(bh));
+		bmp_close(bh);
+		return;
+	}
+
 	buf_bmp(bh, 0, 0);
 	bmp_close(bh);
 
@@ -292,7 +301,7 @@ int main(int argc, char *argv[])
 	ts = ts_init();
 
 	L = luaL_newstate();
-	luaopen_base(L);
+	luaL_openlibs(L);
 
 	lua_register(L, "set_count", lua_set_icon_count);
 	lua_register(L, "set_icon", lua_set_icon_info);
@@ -310,6 +319,9 @@ int main(int argc, char *argv[])
 		struct cmd_list *j;
 
 		da_count = get_DeviceAttached();
+		if (!da_count)
+			da_count = 1;
+
 		if (!old_da_count)
 			old_da_count = da_count;
 		else {
@@ -322,9 +334,6 @@ int main(int argc, char *argv[])
 				continue;
 			}
 		}
-
-		if (!da_count)
-			da_count = 1;
 
 		set_bgimage();
 		set_bgcolor();
