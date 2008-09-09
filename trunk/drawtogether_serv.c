@@ -16,8 +16,14 @@
 #include "fbutils.h"
 
 #define DEBUG 1
+#define VFB_MAX 4
 
 int serv_sock, clnt_sock;
+int mylocation;
+char ipaddr[VFB_MAX][16];
+int numofdevice;
+int isconnected[4];
+
 static int palette [] =
 {
 	0x000000, 0xffe080, 0xffffff, 0xe0c0a0, 0x304050, 0x80b8c0
@@ -180,6 +186,69 @@ int tcp_server_accept(int serv_sock)
 	return ret;
 }
 
+void reset_ipaddr(void)
+{
+	int i, ret, fd;
+	int num,temp;
+	char myip[4] = {0,};
+	char temp_base_ip[16]; 
+	char temp_ip[4] = {0,};
+	char base_ip[16] = "192.168.123.";
+
+	num = get_DeviceAttached();
+	numofdevice = 0;
+
+	fd = open("/root/config_MyIp", O_RDONLY);
+	if (fd < 0) {
+		exit(1);	
+	} else {
+		ret = read(fd, myip, 3);
+		if (ret < 0) {
+			perror("read myip");
+			exit(1);
+		}
+	}
+
+#ifdef DEBUG
+	fprintf(stderr, "MyIP: %s\n", myip);
+#endif	
+	if(num)//if there's no device attached we don't need to do this.
+	{
+		for (i=0; i<VFB_MAX; i++) 
+		{
+			ret = get_IpInfo(i, temp_ip);
+			temp_ip[ret] = '\0';
+
+			temp = atoi(temp_ip);	
+			if(!temp)
+			{
+				numofdevice++;
+				isconnected[i] = 1;
+			}
+			else
+			{
+				//do sth because we need to know who's connected who's not.
+				isconnected[i] = 0;
+			}	
+			if (strncmp(temp_ip, myip, 3) == 0) {
+				mylocation = i;
+				isconnected[i] = 0; //we shouldn't try to connect to our own ip.
+				//continue;
+			}
+			strncpy(temp_base_ip, base_ip, 12);
+			temp_base_ip[12] = '\0';
+			strncat(temp_base_ip, temp_ip, 3);
+			strcpy(ipaddr[i], temp_base_ip);
+#ifdef DEBUG
+			fprintf(stderr, "[%2d] %s\n", i, ipaddr[i]);
+#endif
+		}
+	}
+
+	if (fd > 0)
+		close(fd);
+}
+
 void *read_ts(void *data)
 {
 	int x,y;
@@ -232,28 +301,22 @@ void *read_ts(void *data)
 
 
 
-int main(int argc, char *argv[])
+int main()
 {
 	struct tsdev *ts;
 	unsigned int i;
 	int ret;
 	int connect = 0;
 	char buff[10]="";
-	char *myaddr;
+	char myaddr[16];
 	pthread_t ts_thread;
 	char *tsdevice = "/dev/ts0";
-
-	if (argc < 2) 
-	{
-		printf("USAGE : %s myip\n", argv[0]);
-		exit(1);
-	}
-
 
 	signal(SIGSEGV, sig);
 	signal(SIGINT, sig);
 	signal(SIGTERM, sig);
 
+	//open touchscreen device
 	ts = ts_open(tsdevice,0);
 
 	if(!ts)
@@ -267,7 +330,7 @@ int main(int argc, char *argv[])
 		perror("ts_config");
 		exit(1);
 	}
-	//myfb = myfb_open();
+
 	if(open_framebuffer()){
 		close_framebuffer();
 		exit(1);
@@ -275,6 +338,9 @@ int main(int argc, char *argv[])
 	for(i=0;i<NR_COLORS;i++)
 		setcolor(i,palette[i]);
 
+	/* button settings for server program 
+	 * server program only have clear and exit button.
+	 */
 	memset(&buttons,0,sizeof(buttons));
 	buttons[0].w  = 70;
 	buttons[0].h  = 20;
@@ -286,8 +352,12 @@ int main(int argc, char *argv[])
 	buttons[1].text = "X";
 
 	refresh_screen();
+	reset_ipaddr();
+	strcpy(myaddr,ipaddr[mylocation]);
+#ifdef DEBUG
+	printf("myaddr : %s\n",myaddr);
+#endif
 
-	myaddr = argv[1];
 	serv_sock = tcp_server_listen(ip2port(myaddr,7777),2);
 	if(serv_sock < 0)
 	{
@@ -321,6 +391,7 @@ int main(int argc, char *argv[])
 			if(!strcmp(buff,"Merge"))
 			{
 				//merge mode
+				buff[0] = '\0';
 #ifdef DEBUG
 				printf("Merge mode on\n");
 #endif
@@ -337,30 +408,27 @@ int main(int argc, char *argv[])
 					printf("server sent : %d\n",ret);
 				}
 #endif
-				buff[0] = '\0';
 			}
 			else if(!strcmp(buff,"Split"))
 			{
 				//split mode
+				buff[0] = '\0';
 #ifdef DEBUG
 				printf("Split mode on\n");
-				buff[0] = '\0';
 #endif
 			}
 			else if(!strcmp(buff,"X"))
 			{
+				buff[0] = '\0';
 #ifdef DEBUG
 				printf("Exit\n");
 #endif
-				buff[0] = '\0';
 				break;
 			}
-			buff[0] = '\0';
 
 		}
 		close(clnt_sock);
-		
 	}
 	pthread_join(ts_thread, NULL);
-	close(clnt_sock);
+	close(serv_sock);
 }

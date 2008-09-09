@@ -16,8 +16,13 @@
 //#include "oo.h"
 
 //#define SERVERADDR "192.168.77.55"
-
+#define VFB_MAX 4
 #define DEBUG 1
+
+int mylocation;
+char ipaddr[VFB_MAX][16];
+int numofdevice;
+int isconnected[4];
 
 static int palette [] =
 {
@@ -121,7 +126,8 @@ int tcp_client_connect(char *server_addr, int port)
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (sock == -1){
 		perror("socket()");
-		exit(1);
+		//exit(1);
+		//program must not stop if connection is not ok
 	}
 
 	memset(&serv_addr, 0, sizeof(struct sockaddr_in));
@@ -133,12 +139,76 @@ int tcp_client_connect(char *server_addr, int port)
 	if (ret == -1) {
 		close(sock);
 		perror("connect()");
-		exit(1);
+		//exit(1);
+		//program must not stop if connection is not ok
 	}
 
 	return sock;
 }
 
+
+void reset_ipaddr(void)
+{
+	int i, ret, fd;
+	int num,temp;
+	char myip[4] = {0,};
+	char temp_base_ip[16]; 
+	char temp_ip[4] = {0,};
+	char base_ip[16] = "192.168.123.";
+
+	num = get_DeviceAttached();
+	numofdevice = 0;
+
+	fd = open("/root/config_MyIp", O_RDONLY);
+	if (fd < 0) {
+		exit(1);	
+	} else {
+		ret = read(fd, myip, 3);
+		if (ret < 0) {
+			perror("read myip");
+			exit(1);
+		}
+	}
+
+#ifdef DEBUG
+	fprintf(stderr, "MyIP: %s\n", myip);
+#endif	
+	if(num)//if there's no device attached we don't need to do this.
+	{
+		for (i=0; i<VFB_MAX; i++) 
+		{
+			ret = get_IpInfo(i, temp_ip);
+			temp_ip[ret] = '\0';
+
+			temp = atoi(temp_ip);	
+			if(!temp)
+			{
+				numofdevice++;
+				isconnected[i] = 1;
+			}
+			else
+			{
+				//do sth because we need to know who's connected who's not.
+				isconnected[i] = 0;
+			}	
+			if (strncmp(temp_ip, myip, 3) == 0) {
+				mylocation = i;
+				isconnected[i] = 0; //we shouldn't try to connect to our own ip.
+				//continue;
+			}
+			strncpy(temp_base_ip, base_ip, 12);
+			temp_base_ip[12] = '\0';
+			strncat(temp_base_ip, temp_ip, 3);
+			strcpy(ipaddr[i], temp_base_ip);
+#ifdef DEBUG
+			fprintf(stderr, "[%2d] %s\n", i, ipaddr[i]);
+#endif
+		}
+	}
+
+	if (fd > 0)
+		close(fd);
+}
 
 static void refresh_screen()
 {
@@ -167,11 +237,12 @@ int main()
 	unsigned int i,j;
 	unsigned int merge;
 	unsigned int mode = 0;
-	unsigned int numofdevice = 0;
-	unsigned char *buff,*old;
+	unsigned char *buff,*old,*temp;
 	//unsigned short temp;
-	int serv_sock;
-	char serv_addr[] = "192.168.77.77";
+	int serv_sock[VFB_MAX];
+	//char serv_addr[] = "192.168.77.77";
+	char serv_addr[VFB_MAX][16];
+	char myip[16];
 
 	char *tsdevice="/dev/ts0";
 
@@ -217,16 +288,29 @@ int main()
 	buttons[3].text = "X";
 
 	refresh_screen();
-	numofdevice = 1;
+	reset_ipaddr();//this will update numofdevice as well.
+
+	for(i=0;i<VFB_MAX;i++)
+	{
+		if(isconnected[i])
+			strcpy(serv_addr[i],ipaddr[i]);
+	}
+
 	//need to connect to server
 	//what we need here is function that perform setting network connection
 	//between adjacent devices.
 
-	serv_sock = tcp_client_connect(serv_addr,ip2port(serv_addr,7777));
+	for(i=0;i<VFB_MAX;i++)
+	{
+		if(isconnected[i])
+			serv_sock[i] = tcp_client_connect(serv_addr[i],ip2port(serv_addr[i],7777));
+	}
 	buff = (unsigned char *)malloc(fix.smem_len);
 	old = (unsigned char *)malloc(fix.smem_len);
+	temp = (unsigned char *)malloc(fix.smem_len);
 	memset(buff,0,fix.smem_len);
 	memset(old,0,fix.smem_len);
+	memset(temp,0,fix.smem_len);
 
 	while(1)
 	{
@@ -255,43 +339,6 @@ int main()
 						//refresh_screen();
 						/* we need a code for Merge here */
 						/* request other devices to send their fb data */
-						ret = write(serv_sock,buttons[mode].text,strlen(buttons[mode].text));
-						if(ret<=0)
-						{
-							perror("write");
-							exit(1);
-						}
-#ifdef DEBUG
-						else
-						{
-							printf("send : %d\n",ret);
-						}
-#endif
-						//now we need to read datas from others.
-						count=0;
-						read_flag=0;
-						while(!read_flag){
-							ret = read(serv_sock,buff+count,fix.smem_len);
-							if(ret<=0)
-							{
-								perror("read");
-								exit(1);
-							}
-							count+=ret;
-#ifdef DEBUG
-							printf(" read : %d\n",count);
-#endif
-							if(count>=fix.smem_len)
-							{
-								read_flag=1;
-							}
-							
-						}
-#ifdef DEBUG
-						printf("read finished!!\n");
-#endif
-						/* save the recent data in old and mix buff and fb together!!
-						*/
 #ifdef DEBUG
 						printf("before saving old fb\n");
 #endif
@@ -299,20 +346,60 @@ int main()
 #ifdef DEBUG
 						printf("old fbuffer saved!!\n");
 #endif
+						for(i=0;i<VFB_MAX;i++)
+							if(isconnected[i]){
+								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text));
+								if(ret<=0)
+								{
+									perror("write");
+									exit(1);
+								}
+#ifdef DEBUG
+								else
+								{
+									printf("send : %d\n",ret);
+								}
+#endif
+							}
+						//now we need to read datas from others.
+						for(i=0;i<VFB_MAX;i++)
+						{
+							if(isconnected[i])
+							{
+								count=0;
+								read_flag=0;
+								while(!read_flag){
+									ret = read(serv_sock[i],buff+count,fix.smem_len);
+									if(ret<=0)
+									{
+										perror("read");
+										exit(1);
+									}
+									count+=ret;
+#ifdef DEBUG
+									printf(" read : %d\n",count);
+#endif
+									if(count>=fix.smem_len)
+									{
+										read_flag=1;
+									}
+
+								}
+#ifdef DEBUG
+								printf("read finished!!\n");
+#endif
+								for(i=0;i<fix.smem_len;i++)
+								{
+									//fbuffer[i]|=buff[i];
+									temp[i]|=buff[i];
+									//temp |= buff[i];
+
+								}
+							}
+						}
 						for(i=0;i<fix.smem_len;i++)
 						{
-							//fprintf(stdout,"before fbuffer[%d] = %x buff[%d] = %x\n",i,fbuffer[i],i,buff[i]);
-							fbuffer[i]|=buff[i];
-#ifdef DEBUG
-							//printf("fbuffer[j] = %x fbuffer[j+1] = %x\n",fbuffer[j],fbuffer[j+1]);
-#endif
-							//temp = (unsigned short)fbuffer[j];
-#ifdef DEBUG
-							//fprintf(stdout,"after fbuffer[%d] = %x\n",i,fbuffer[i]);
-							//getchar();
-#endif
-							//temp |= buff[i];
-
+							fbuffer[i]|=temp[i];
 						}
 						merge = 1;
 						break;
@@ -320,18 +407,23 @@ int main()
 						mode = 2;
 						//refresh_screen();
 						/* code for Split */
-						ret = write(serv_sock,buttons[mode].text,strlen(buttons[mode].text));
-						if(ret<=0)
+						for(i=0;i<VFB_MAX;i++)
 						{
-							perror("write");
-							exit(1);
-						}
+							if(isconnected[i]){
+								ret = write(serv_sock,buttons[mode].text,strlen(buttons[mode].text));
+								if(ret<=0)
+								{
+									perror("write");
+									exit(1);
+								}
 #ifdef DEBUG
-						else
-						{
-							printf("send : %d\n",ret);
-						}
+								else
+								{
+									printf("send : %d\n",ret);
+								}
 #endif
+							}
+						}
 						/* do sth .. what should we do 
 						 * 'split' means we need to get back previous status of fb.
 						 */
@@ -344,11 +436,17 @@ int main()
 						break;
 					case 3://exit button clicked
 						mode = 3;
-						ret = write(serv_sock,buttons[mode].text,strlen(buttons[mode].text));
-						if(ret<=0)
+						for(i=0;i<VFB_MAX;i++)
 						{
-							perror("write");
-							exit(1);
+							if(isconnected[i])
+							{
+								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text));
+								if(ret<=0)
+								{
+									perror("write");
+									exit(1);
+								}
+							}
 						}
 						put_string_center (xres/2, yres/2,   "Bye~!!", 1);
 						sleep(2);
