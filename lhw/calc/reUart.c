@@ -113,19 +113,41 @@ initPoll(fd);
 											break;
 						case 'w':	flag=DISCON_MSG_T;
 											system("echo "" > /proc/board_status/IpInfo/IpInfo0");
+											IsConnectBuf=get_IsConnect();
+											IsConnectBuf &= 16;
+											set_IsConnect(IsConnectBuf);
+											cal_process_start();
+
 											printf("Top disconnect\n");
 											break;
 						case 'a':	flag=DISCON_MSG_L;
 											system("echo "" > /proc/board_status/IpInfo/IpInfo1");
+											IsConnectBuf=get_IsConnect();
+											IsConnectBuf &= 13;
+											set_IsConnect(IsConnectBuf);
+											cal_process_start();
+
 											printf("Left disconnect\n");
-										break;
+											break;
 						case 'f':	flag=DISCON_MSG_R;
 											system("echo "" > /proc/board_status/IpInfo/IpInfo3");
+
+											IsConnectBuf=get_IsConnect();
+											IsConnectBuf &= 7;
+											set_IsConnect(IsConnectBuf);
+											cal_process_start();
+
 											printf("Right disconnect\n");
-								break;
+											break;
 						case 'x':	flag=DISCON_MSG_B;
 											system("echo "" > /proc/board_status/IpInfo/IpInfo2");
-										printf("Bottom disconnect\n");
+											IsConnectBuf=get_IsConnect();
+											IsConnectBuf &= 11;
+											set_IsConnect(IsConnectBuf);
+											cal_process_start();
+
+
+											printf("Bottom disconnect\n");
 							break;
 						
 						case 't':
