@@ -114,8 +114,6 @@ int main(int argc, char *argv[])
 	if (serv_sock < 0)
 		exit(1);
 
-//	buff = (unsigned short *)malloc(2);
-	
 /* main process */
 	while (1) 
 	{
@@ -159,18 +157,12 @@ int main(int argc, char *argv[])
 				printf(" debug :: send data  \n" );
 				fb_send(clnt_sock, vfb_list[0], myfb->fbfix.smem_len);
 				count = 0 ;
-				//	show_vfb(vfb_list[0]);
+					show_vfb(vfb_list[0]);
 				}
 				
-				//setsockopt(clnt_sock,SOL_TCP, SO_NODELAY,0,0);
-/*
-				ret_ack = read(clnt_sock, &ack,1);	
-				if( ack == '1')
-				{
-					break;
-				}
-*/
-			}while(1);
+			}
+
+		}while(1);
 
 			close(clnt_sock);
 			exit(0);
