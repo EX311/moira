@@ -82,17 +82,19 @@ void free_icon(void)
 {
 	struct icon *temp;
 	struct icon *p_temp = head;
-	while (p_temp->next) {
-		temp = p_temp->next;
+	if (p_temp) {
+		while (p_temp->next) {
+			temp = p_temp->next;
+			if (p_temp->name)
+				free(p_temp->name);
+			free(p_temp);
+			p_temp = temp;
+		}
+
 		if (p_temp->name)
 			free(p_temp->name);
 		free(p_temp);
-		p_temp = temp;
 	}
-
-	if (p_temp->name)
-		free(p_temp->name);
-	free(p_temp);
 	head = NULL;
 }
 
@@ -147,21 +149,24 @@ void free_cmd(void)
 {
 	struct cmd_list *temp;
 	struct cmd_list *p_temp = cmdlist;
-	while (p_temp->next) {
-		temp = p_temp->next;
+
+	if (p_temp) {
+		while (p_temp->next) {
+			temp = p_temp->next;
+			if (p_temp->path)
+				free(p_temp->path);
+			if (p_temp->args)
+				free(p_temp->args);
+			free(p_temp);
+			p_temp = temp;
+		}
+
 		if (p_temp->path)
 			free(p_temp->path);
 		if (p_temp->args)
 			free(p_temp->args);
 		free(p_temp);
-		p_temp = temp;
 	}
-
-	if (p_temp->path)
-		free(p_temp->path);
-	if (p_temp->args)
-		free(p_temp->args);
-	free(p_temp);
 	cmdlist = NULL;
 }
 
@@ -302,11 +307,11 @@ int main(int argc, char *argv[])
 	L = luaL_newstate();
 	luaL_openlibs(L);
 
-	lua_register(L, "set_count", lua_set_icon_count);
-	lua_register(L, "set_icon", lua_set_icon_info);
-	lua_register(L, "set_cmd", lua_set_cmd_list);
-	lua_register(L, "set_bgcolor", lua_set_bgcolor);
-	lua_register(L, "set_bgimage", lua_set_bgimage);
+	lua_register(L, "SET_COUNT", lua_set_icon_count);
+	lua_register(L, "SET_ICON", lua_set_icon_info);
+	lua_register(L, "SET_CMD", lua_set_cmd_list);
+	lua_register(L, "SET_BGCOLOR", lua_set_bgcolor);
+	lua_register(L, "SET_BGIMAGE", lua_set_bgimage);
 
 	luaL_dofile(L, file_ui);
 	lua_close(L);

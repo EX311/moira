@@ -22,8 +22,6 @@
 #define FB_NAME    "/dev/fb0" 
 #define TTY_NAME   "/dev/ttyS0" 
 
-#define DEBUG 0
-
 
 
 extern struct myfb_info *myfb;

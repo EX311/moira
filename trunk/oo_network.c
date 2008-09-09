@@ -19,8 +19,8 @@
 #include "read_proc.h"
 
 extern struct myfb_info *myfb;
-extern char ipaddr[VFB_MAX][16];
-extern int mylocation;
+//extern char ipaddr[VFB_MAX][16];
+//extern int mylocation;
 
 int error_handling(char *message)
 {
@@ -182,7 +182,7 @@ int free_net_buf(struct oo_fb_data *buf)
 	}
 	return -1;
 }
-
+/*
 void insert_ipaddr(void)
 {
 	int i, ret, fd;
@@ -226,3 +226,4 @@ void insert_ipaddr(void)
 		close(fd);
 	return;
 }
+*/
