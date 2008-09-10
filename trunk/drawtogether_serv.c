@@ -341,6 +341,10 @@ int main()
 		perror("ts_config");
 		exit(1);
 	}
+	if(open_framebuffer()){
+		close_framebuffer();
+		exit(1);
+	}
 
 	for(i=0;i<NR_COLORS;i++)
 		setcolor(i,palette[i]);
@@ -358,6 +362,7 @@ int main()
 	buttons[1].x = 280; buttons[1].y = 20;
 	buttons[1].text = "Exit";
 
+	refresh_screen();
 	//sleep(30);
 	reset_ipaddr();
 	//strcpy(myaddr,ipaddr[mylocation]);
@@ -380,6 +385,7 @@ int main()
 		printf("server started!!! Ip: %s Port : %d\n",myaddr,ip2port(myaddr,7777));
 	}
 
+	pthread_create(&ts_thread, NULL, read_ts,ts);
 	while(1)
 	{
 
@@ -395,12 +401,6 @@ int main()
 			printf("accept successful!!\n");
 #endif
 		}
-		if(open_framebuffer()){
-			close_framebuffer();
-			exit(1);
-		}
-		refresh_screen();
-		pthread_create(&ts_thread, NULL, read_ts,ts);
 
 		while(1)
 		{
