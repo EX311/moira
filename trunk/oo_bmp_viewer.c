@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
 	/* main loop */
 	while (quit != 0) {
 		clear_vfb_buf(VFB_MAX);
-		buf_bmp(bh, x+160, y+120);
+		buf_bmp(bh, x, y);
 		for (i=0; i<VFB_MAX; i++) {
 			if (fb_sock[i] > 0) {
 				ret = fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
