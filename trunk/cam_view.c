@@ -263,13 +263,10 @@ void send_data(func)
 	int i ;
 	for (i=1; i<VFB_MAX; i++) 
 	{
-		//   change ->  start i = 0
-		   if ( get_MasterLocation() == i )
-		      continue;
 		
-		 if(func ==2)
+		if(func ==2 && sock[i] > 0)
 			fb_send(sock[i], vfb_list[0], myfb->fbfix.smem_len);
-		else if (func ==3)
+		else if (func ==3 && sock[i]>0)
 		{
 			fb_send(sock[i], vfb_list[i], myfb->fbfix.smem_len);
 		}
@@ -303,7 +300,7 @@ int main(void)
 	struct color tmp_color;
 
 	int i,j;
-
+	int tmp = 0;
 
 	signal(SIGSEGV, sig);
 	signal(SIGINT, sig);
@@ -364,6 +361,7 @@ int main(void)
 				}
 			}
 			}
+			tmp = 1 ;
 		}
 		event = 0;
 		while(1)
@@ -393,11 +391,23 @@ int main(void)
 			{
 				show_vfb(vfb_list[0]);//  demo ver need change 0 to  mylocation	
 			}
-			else if (func != 1 &&  sock[1] > 0 )
+			else if (func == 2)
 			{
+				if (tmp ==0)
+					break;
 				send_data(func);
 				show_vfb(vfb_list[0]);//  demo ver need change 0 to  mylocation	
 			}
+			
+			else if (func == 3)
+			{
+				if (tmp ==0)
+					break;
+				send_data(func);
+				show_vfb(vfb_list[get_MyLocation()]);//  demo ver need change 0 to  mylocation	
+
+			}
+
 			for (i=0; i<myicon_count; i++)
 				draw_icon(&icon[i]);
 
