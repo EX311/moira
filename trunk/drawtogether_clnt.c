@@ -356,28 +356,21 @@ int main()
 #ifdef DEBUG
 						printf("old fbuffer saved!!\n");
 #endif
+						//now we need to read datas from others.
 						for(i=0;i<VFB_MAX;i++)
 						{
-							if(isconnected[i]){
+							if(isconnected[i])
+							{
 								ret = write(serv_sock[i],buttons[mode].text,strlen(buttons[mode].text)+1);
 								if(ret<=0)
 								{
 									perror("write");
 									exit(1);
 								}
-#ifdef DEBUG
 								else
 								{
 									printf("send : %d\n",ret);
 								}
-#endif
-							}
-						}
-						//now we need to read datas from others.
-						for(i=0;i<VFB_MAX;i++)
-						{
-							if(isconnected[i])
-							{
 								printf("i : %d\n",i);
 								count=0;
 								read_flag=0;

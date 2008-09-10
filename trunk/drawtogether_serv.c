@@ -410,6 +410,7 @@ int main()
 				{
 					printf("server sent : %d\n",ret);
 				}
+				sleep(1);
 #endif
 			}
 			/*
@@ -446,6 +447,7 @@ int main()
 			{
 				//split mode
 				buff[0] = '\0';
+				sleep(1);
 #ifdef DEBUG
 				printf("Split mode on\n");
 				printf("is buff cleared ? : %s\n",buff);
@@ -454,6 +456,7 @@ int main()
 			else if(!strcmp(buff,"Exit"))
 			{
 				buff[0] = '\0';
+				sleep(1);
 #ifdef DEBUG
 				printf("Exit\n");
 				printf("is buff cleared ? : %s\n",buff);
@@ -463,6 +466,7 @@ int main()
 			else
 			{
 				buff[0] = '\0';
+				sleep(1);
 			//	continue;
 				break;
 			}
