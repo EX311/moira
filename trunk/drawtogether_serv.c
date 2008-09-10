@@ -299,12 +299,14 @@ int main()
 {
 	struct tsdev *ts;
 	unsigned int i;
-	int ret;
+	int ret,count;
 	int connect = 0;
 	char buff[10]="";
 	char myaddr[16] = "";
+	char *fbuff;
 	pthread_t ts_thread;
 	char *tsdevice = "/dev/ts0";
+	int read_flag;
 
 	signal(SIGSEGV, sig);
 	signal(SIGINT, sig);
@@ -360,6 +362,10 @@ int main()
 		close_framebuffer();
 		exit(1);
 	}
+	else
+	{
+		printf("server started!!! Ip: %s Port : %d\n",myaddr,ip2port(myaddr,7777));
+	}
 
 	pthread_create(&ts_thread, NULL, read_ts,ts);
 	while(1)
@@ -406,6 +412,36 @@ int main()
 				}
 #endif
 			}
+			/*
+			else if(!strcmp(buff,"Send"))
+			{
+				buff[0] = '\0';
+				count=0;
+				read_flag=0;
+				while(!read_flag)
+				{
+					ret = read(clnt_sock,fbuff+count,fix.smem_len);
+					if(ret<=0)				
+					{
+						perror("read");
+						exit(1);
+					}
+					count+=ret;
+#ifdef DEBUG
+					printf(" read : %d\n",count);
+#endif
+					if(count>=fix.smem_len)
+					{
+						read_flag = 1;
+					}
+				}
+				for(i=0;i<fix.smem_len;i++)
+				{
+					fbuffer[i]|=fbuff[i];
+				}
+
+			}
+			*/
 			else if(!strcmp(buff,"Split"))
 			{
 				//split mode
@@ -415,7 +451,7 @@ int main()
 				printf("is buff cleared ? : %s\n",buff);
 #endif
 			}
-			else if(!strcmp(buff,"X"))
+			else if(!strcmp(buff,"Exit"))
 			{
 				buff[0] = '\0';
 #ifdef DEBUG
@@ -427,7 +463,8 @@ int main()
 			else
 			{
 				buff[0] = '\0';
-				continue;
+			//	continue;
+				break;
 			}
 
 		}

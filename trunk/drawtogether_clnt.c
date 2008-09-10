@@ -13,6 +13,7 @@
 
 #include "tslib.h"
 #include "fbutils.h"
+#include "read_proc.h"
 //#include "oo.h"
 
 //#define SERVERADDR "192.168.77.55"
@@ -21,8 +22,10 @@
 
 int mylocation;
 char ipaddr[VFB_MAX][16];
-int numofdevice;
+//int numofdevice;
+int deviceattached;
 int isconnected[4];
+int tilt;
 
 static int palette [] =
 {
@@ -157,6 +160,7 @@ void reset_ipaddr(void)
 	char base_ip[16] = "192.168.123.";
 
 
+	deviceattached = get_DeviceAttached();
 	fd = open("/root/config_MyIp", O_RDONLY);
 	if (fd < 0) {
 		exit(1);	
@@ -171,6 +175,7 @@ void reset_ipaddr(void)
 #ifdef DEBUG
 	fprintf(stderr, "MyIP: %s\n", myip);
 #endif	
+	num = atoi(myip);
 	for (i=0; i<VFB_MAX; i++) 
 	{
 		ret = get_AfterMasterIp(i, temp_ip);
@@ -179,16 +184,23 @@ void reset_ipaddr(void)
 		temp = atoi(temp_ip);	
 		if(!temp)
 		{
+			printf("ip : %d is not connected index : %d\n",temp,i);
 			isconnected[i] = 0;
+			printf("isconnected[%d] = %d\n",i,isconnected[i]);
 		}
 		else
 		{
 			//do sth because we need to know who's connected who's not.
+			printf("ip : %d is connected index : %d\n",temp,i);
 			isconnected[i] = 1;
+			printf("isconnected[%d] = %d\n",i,isconnected[i]);
 		}	
-		if (strncmp(temp_ip, myip, 3) == 0) {
+	//	if (strncmp(temp_ip, myip, 3) == 0) {
+		if(temp==num){
 			mylocation = i;
+			printf("ip : %d is myip index : %d so not connected \n",temp,i);
 			isconnected[i] = 0; //we shouldn't try to connect to our own ip.
+			printf("isconnected[%d] = %d\n",i,isconnected[i]);
 			//continue;
 		}
 		strncpy(temp_base_ip, base_ip, 12);
@@ -278,7 +290,7 @@ int main()
 	buttons[3].w = 20;
 	buttons[3].h = 20;
 	buttons[3].x = 280; buttons[3].y = 20;
-	buttons[3].text = "X";
+	buttons[3].text = "Exit";
 
 	refresh_screen();
 	reset_ipaddr();//this will update numofdevice as well.
@@ -366,6 +378,7 @@ int main()
 						{
 							if(isconnected[i])
 							{
+								printf("i : %d\n",i);
 								count=0;
 								read_flag=0;
 								while(!read_flag){
@@ -386,7 +399,7 @@ int main()
 
 								}
 #ifdef DEBUG
-								printf("read finished!!\n");
+								printf("read finished!! for serv_sock[%d]\n",i);
 #endif
 								for(i=0;i<fix.smem_len;i++)
 								{
@@ -402,6 +415,7 @@ int main()
 							fbuffer[i]|=temp[i];
 						}
 						merge = 1;
+						printf("Merged!! \n");
 						break;
 					case 2://split button clicked
 						mode = 2;
@@ -446,6 +460,7 @@ int main()
 									perror("write");
 									exit(1);
 								}
+								printf("closing serv_sock[%d]!!\n",i);
 								close(serv_sock[i]);
 							}
 						}
