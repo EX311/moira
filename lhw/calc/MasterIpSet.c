@@ -1,10 +1,12 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
 
+#include "read_proc.h"
 
 int main()
 {
@@ -29,6 +31,10 @@ int main()
 	{
 		case 0:	//0000
 //			set_MyLocation(5);
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp0");
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp1");
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp2");
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp3");
 			break;
 	
 		case 1:	//0001

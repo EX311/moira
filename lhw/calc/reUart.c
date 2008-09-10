@@ -15,7 +15,7 @@
 #define DISCON_MSG_R 67
 
 
-#define DEBUG 0
+#define DEBUG 1
 
 #define FIRST 16
 #define SECOND 8

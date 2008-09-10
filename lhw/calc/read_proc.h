@@ -11,6 +11,7 @@ int AfterMasterIp_fd_return(int num);
 int MyLocation_fd_return(void);
 int MasterLocation_fd_return(void);
 int DeviceAttached_fd_return(void);
+int Senser_fd_return(void);
 
 //read_proc_function
 char get_IsConnect(void);
