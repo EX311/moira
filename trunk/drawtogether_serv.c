@@ -67,7 +67,7 @@ static void button_draw (struct ts_button *button)
 			button->x + button->w - 2,
 			button->y + button->h - 2, button_palette [s + 1]);
 	//and draw fonts inside the button with palette[5] or [2].
-	if(strcmp(button->text,"X")==0)
+	if(strcmp(button->text,"Exit")==0)
 	{//when it's exit button.
 		//let's draw decent exit button.
 		//put_string(button->x + 2,button->y + 2,button->text, button_palette[s + 2]);
@@ -345,7 +345,7 @@ int main()
 	buttons[1].w = 20;
 	buttons[1].h = 20;
 	buttons[1].x = 280; buttons[1].y = 20;
-	buttons[1].text = "X";
+	buttons[1].text = "Exit";
 
 	refresh_screen();
 	reset_ipaddr();
