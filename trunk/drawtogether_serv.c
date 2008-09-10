@@ -358,7 +358,7 @@ int main()
 	buttons[1].x = 280; buttons[1].y = 20;
 	buttons[1].text = "Exit";
 
-	sleep(30);
+	//sleep(30);
 	reset_ipaddr();
 	//strcpy(myaddr,ipaddr[mylocation]);
 	strcpy(myaddr,my_ipaddr);
