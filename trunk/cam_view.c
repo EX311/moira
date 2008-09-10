@@ -24,7 +24,7 @@
 #include "oo.h"
 #include "read_proc.h"
 
-#include "/home/work/source/rebis-2.6/drivers/media/video/userapp.h" // linux source tree for rebis
+#include "/kernel/drivers/media/video/userapp.h" // linux source tree for rebis
 
 #define CODEC_NAME  "/dev/preview"
 

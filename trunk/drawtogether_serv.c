@@ -327,10 +327,6 @@ int main()
 		exit(1);
 	}
 
-	if(open_framebuffer()){
-		close_framebuffer();
-		exit(1);
-	}
 	for(i=0;i<NR_COLORS;i++)
 		setcolor(i,palette[i]);
 
@@ -347,7 +343,6 @@ int main()
 	buttons[1].x = 280; buttons[1].y = 20;
 	buttons[1].text = "Exit";
 
-	refresh_screen();
 	reset_ipaddr();
 	strcpy(myaddr,ipaddr[mylocation]);
 #ifdef DEBUG
@@ -367,7 +362,6 @@ int main()
 		printf("server started!!! Ip: %s Port : %d\n",myaddr,ip2port(myaddr,7777));
 	}
 
-	pthread_create(&ts_thread, NULL, read_ts,ts);
 	while(1)
 	{
 
@@ -383,13 +377,20 @@ int main()
 			printf("accept successful!!\n");
 #endif
 		}
+		if(open_framebuffer()){
+			close_framebuffer();
+			exit(1);
+		}
+		refresh_screen();
+		pthread_create(&ts_thread, NULL, read_ts,ts);
+
 		while(1)
 		{
 			ret = read(clnt_sock,buff,10);
 #ifdef DEBUG
 			printf("buff = %s\n",buff);
 #endif
-			
+
 			if(!strcmp(buff,"Merge"))
 			{
 				//merge mode
@@ -414,66 +415,67 @@ int main()
 #endif
 			}
 			/*
-			else if(!strcmp(buff,"Send"))
-			{
-				buff[0] = '\0';
-				count=0;
-				read_flag=0;
-				while(!read_flag)
-				{
-					ret = read(clnt_sock,fbuff+count,fix.smem_len);
-					if(ret<=0)				
-					{
-						perror("read");
-						exit(1);
-					}
-					count+=ret;
+			   else if(!strcmp(buff,"Send"))
+			   {
+			   buff[0] = '\0';
+			   count=0;
+			   read_flag=0;
+			   while(!read_flag)
+			   {
+			   ret = read(clnt_sock,fbuff+count,fix.smem_len);
+			   if(ret<=0)				
+			   {
+			   perror("read");
+			   exit(1);
+			   }
+			   count+=ret;
 #ifdef DEBUG
-					printf(" read : %d\n",count);
+printf(" read : %d\n",count);
 #endif
-					if(count>=fix.smem_len)
-					{
-						read_flag = 1;
-					}
-				}
-				for(i=0;i<fix.smem_len;i++)
-				{
-					fbuffer[i]|=fbuff[i];
-				}
+if(count>=fix.smem_len)
+{
+read_flag = 1;
+}
+}
+for(i=0;i<fix.smem_len;i++)
+{
+fbuffer[i]|=fbuff[i];
+}
 
-			}
-			*/
-			else if(!strcmp(buff,"Split"))
-			{
-				//split mode
-				buff[0] = '\0';
-				sleep(1);
+}
+*/
+else if(!strcmp(buff,"Split"))
+{
+	//split mode
+	buff[0] = '\0';
+	sleep(1);
 #ifdef DEBUG
-				printf("Split mode on\n");
-				printf("is buff cleared ? : %s\n",buff);
+	printf("Split mode on\n");
+	printf("is buff cleared ? : %s\n",buff);
 #endif
-			}
-			else if(!strcmp(buff,"Exit"))
-			{
-				buff[0] = '\0';
-				sleep(1);
+}
+else if(!strcmp(buff,"Exit"))
+{
+	buff[0] = '\0';
+	sleep(1);
 #ifdef DEBUG
-				printf("Exit\n");
-				printf("is buff cleared ? : %s\n",buff);
+	printf("Exit\n");
+	printf("is buff cleared ? : %s\n",buff);
 #endif
-				break;
-			}
-			else
-			{
-				buff[0] = '\0';
-				sleep(1);
-			//	continue;
-				break;
-			}
+	break;
+}
+else
+{
+	buff[0] = '\0';
+	sleep(1);
+	//	continue;
+	break;
+}
 
-		}
-		close(clnt_sock);
-	}
-	pthread_join(ts_thread, NULL);
-	close(serv_sock);
+}
+close(clnt_sock);
+pthread_cancel(ts_thread);
+}
+pthread_join(ts_thread, NULL);
+close(serv_sock);
 }
