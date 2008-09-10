@@ -409,6 +409,7 @@ int main()
 						{
 							fbuffer[i]|=temp[i];
 						}
+						memset(temp,0,fix.smem_len);
 						merge = 1;
 						printf("Merged!! \n");
 						break;
