@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
 		set_bgimage();
 		set_bgcolor();
 		for (c=0; c<=da_count; c++)
-			draw_block(myfb->fbvar.xres-12*c+12, 3);
+			draw_block(myfb->fbvar.xres-12*c-12, 3);
 		
 		if (head == NULL) {
 			put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, "Sorry, No Apps. registered!", white);

@@ -40,6 +40,7 @@ char ipaddr[VFB_MAX][16];
 char *file_bmp = NULL;
 
 extern struct myfb_info *myfb;
+extern unsigned short *vfb_list[VFB_MAX];
 
 void *ts_net_read(void *arg);
 void *ts_local_read(void *arg);
@@ -155,11 +156,12 @@ void find_bmp(char *dirname)
 int main(int argc, char *argv[])
 {
 	int i, ret, mode;
-	int fb_sock[VFB_MAX];
+	int fb_sock[VFB_MAX] = {0,};
 	bmphandle_t bh;
 	pthread_t ts_thread[VFB_MAX];
 	void *thread_ret[VFB_MAX];
 	char *invalid_msg = "Sorry, Maximum size 640x480";
+	char *bye_msg = "Bye - thank you!";
 
 	signal(SIGSEGV, sig);
 	signal(SIGINT, sig);
@@ -187,23 +189,27 @@ int main(int argc, char *argv[])
 	} 
 
 	for (i=0; i<VFB_MAX; i++) {
-		if (strlen(ipaddr[i]) > 13) {
-			fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
-			if (fb_sock[i] < 0) 
-				fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
-			else
-				fprintf(stderr, "[FB] %s connect success!\n", ipaddr[i]);
+		if (strlen(ipaddr[i]) > 14) {
 
-			if (mode == 0) {
-				ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
-				if (ts_sock[i] < 0) 
-					fprintf(stderr, "[TS] %s connect error\n", ipaddr[i]);
-				else
-					fprintf(stderr, "[TS] %s connect success!\n", ipaddr[i]);
-			}
+		if (mylocation == i)
+			continue;
+
+		fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
+		if (fb_sock[i] < 0) 
+			fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
+		else
+			fprintf(stderr, "[FB] %s connect success!\n", ipaddr[i]);
+
+		if (mode == 0) {
+			ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
+			if (ts_sock[i] < 0) 
+				fprintf(stderr, "[TS] %s connect error\n", ipaddr[i]);
+			else
+				fprintf(stderr, "[TS] %s connect success!\n", ipaddr[i]);
+		}
 		}
 	}
-
+	
 	set_vfb_buf(VFB_MAX);
 
 	ret = pthread_create(&ts_thread[0], NULL, ts_local_read, (void *)"local");
@@ -232,10 +238,13 @@ int main(int argc, char *argv[])
 	/* main loop */
 	while (quit != 0) {
 		clear_vfb_buf(VFB_MAX);
-		buf_bmp(bh, x, y);
+		buf_bmp(bh, x+160, y+120);
 		for (i=0; i<VFB_MAX; i++) {
 			if (fb_sock[i] > 0) {
-				fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
+				ret = fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
+#ifdef DEBUG
+				fprintf(stderr, "send: #%d to %s\n", ret, ipaddr[i]);
+#endif
 			}
 		}
 		show_vfb(vfb_list[mylocation]);
@@ -262,6 +271,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* clean up */
+	put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, bye_msg, white);
 	clear_vfb_buf(VFB_MAX);
 	bmp_close(bh);
 
@@ -312,7 +322,9 @@ void *ts_net_read(void *arg)
 		fprintf(stderr, "%d -> %ld.%06ld: %6d %6d %6d\n", sock, samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
 #endif
 
-		if (sock == ts_sock[1]) {
+		if (sock == ts_sock[0]) {
+			x = 0; y = 0;
+		} else if (sock == ts_sock[1]) {
 			x = 320; y = 0;
 		} else if (sock == ts_sock[2]) {
 			x = 0; y = 240;
@@ -332,7 +344,6 @@ void *ts_local_read(void *arg)
 	int ret;
 	struct tsdev *ts;
 	struct ts_sample samp;
-	char *bye_msg = "Bye - thank you!";
 #ifdef DEBUG
 	fprintf(stderr, "%s started...\n", (char *)arg);
 #endif
@@ -361,9 +372,21 @@ void *ts_local_read(void *arg)
 		fprintf(stderr, "%s %ld.%06ld: %6d %6d %6d\n", (char *)arg, samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
 #endif
 
-		x = 0; y = 0;
+		switch (mylocation) {
+			case 0:
+				x = 0; y = 0;
+				break;
+			case 1:
+				x = 320; y = 0;
+				break;
+			case 2:
+				x = 0; y = 240;
+				break;
+			case 3:
+				x = 320; y = 240;
+				break;
+		}
 		if (samp.x > 300) {
-			put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, bye_msg, white);
 			break;
 		}
 	}

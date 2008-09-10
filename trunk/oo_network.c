@@ -16,11 +16,11 @@
 #include <sys/socket.h>
 
 #include "oo.h"
-//#include "read_proc.h"
+#include "read_proc.h"
 
 extern struct myfb_info *myfb;
-//extern char ipaddr[VFB_MAX][16];
-//extern int mylocation;
+extern char ipaddr[VFB_MAX][16];
+extern int mylocation;
 
 int error_handling(char *message)
 {
@@ -182,7 +182,7 @@ int free_net_buf(struct oo_fb_data *buf)
 	}
 	return -1;
 }
-/*
+
 void insert_ipaddr(void)
 {
 	int i, ret, fd;
@@ -209,10 +209,14 @@ void insert_ipaddr(void)
 		ret = get_AfterMasterIp(i, temp_ip);
 		temp_ip[ret] = '\0';
 
-		if (strncmp(temp_ip, myip, 3) == 0) {
-			mylocation = i;
-			continue;
-		}
+		mylocation = get_MyLocation();
+//		if (strncmp(temp_ip, myip, 3) == 0) {
+//			mylocation = i;
+#ifdef DEBUG
+			fprintf(stderr, "Mylocation: #%d\n", mylocation);
+#endif
+//			continue;
+//		}
 		strncpy(temp_base_ip, base_ip, 12);
 		temp_base_ip[12] = '\0';
 		strncat(temp_base_ip, temp_ip, 3);
@@ -226,4 +230,4 @@ void insert_ipaddr(void)
 		close(fd);
 	return;
 }
-*/
+
