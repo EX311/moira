@@ -23,6 +23,7 @@ int mylocation;
 char ipaddr[VFB_MAX][16];
 int numofdevice;
 int isconnected[4];
+char my_ipaddr[16];
 
 static int palette [] =
 {
@@ -189,7 +190,7 @@ int tcp_server_accept(int serv_sock)
 void reset_ipaddr(void)
 {
 	int i, ret, fd;
-	int num,temp;
+	int num,temp,mine=0;
 	char myip[4] = {0,};
 	char temp_base_ip[16]; 
 	char temp_ip[4] = {0,};
@@ -228,6 +229,12 @@ void reset_ipaddr(void)
 		if (strncmp(temp_ip, myip, 3) == 0) {
 			mylocation = i;
 			isconnected[i] = 0; //we shouldn't try to connect to our own ip.
+			strncpy(temp_base_ip,base_ip,12);
+			temp_base_ip[12] = '\0';
+			strncat(temp_base_ip,myip,3);
+			strcpy(my_ipaddr,temp_base_ip);
+			temp_base_ip[0] = '\0';
+			mine = 1;
 			//continue;
 		}
 		strncpy(temp_base_ip, base_ip, 12);
@@ -237,6 +244,15 @@ void reset_ipaddr(void)
 #ifdef DEBUG
 		fprintf(stderr, "[%2d] %s\n", i, ipaddr[i]);
 #endif
+	}
+	if(!mine)
+	{
+		temp_base_ip[0] = '\0';
+		strncpy(temp_base_ip,base_ip,12);
+		temp_base_ip[12] = '\0';
+		strncat(temp_base_ip,myip,3);
+		strncat(temp_base_ip,myip,3);
+		strcpy(my_ipaddr,temp_base_ip);
 	}
 
 	if (fd > 0)
@@ -344,9 +360,11 @@ int main()
 	buttons[1].text = "Exit";
 
 	reset_ipaddr();
-	strcpy(myaddr,ipaddr[mylocation]);
+	//strcpy(myaddr,ipaddr[mylocation]);
+	strcpy(myaddr,my_ipaddr);
 #ifdef DEBUG
 	printf("ipaddr[mylocation] : %s\n",ipaddr[mylocation]);
+	printf("my_ipaddr : %s\n",my_ipaddr);
 	printf("myaddr : %s\n",myaddr);
 #endif
 
