@@ -251,7 +251,6 @@ void reset_ipaddr(void)
 		strncpy(temp_base_ip,base_ip,12);
 		temp_base_ip[12] = '\0';
 		strncat(temp_base_ip,myip,3);
-		strncat(temp_base_ip,myip,3);
 		strcpy(my_ipaddr,temp_base_ip);
 	}
 
@@ -447,53 +446,51 @@ int main()
 			   exit(1);
 			   }
 			   count+=ret;
-#ifdef DEBUG
-printf(" read : %d\n",count);
-#endif
-if(count>=fix.smem_len)
-{
-read_flag = 1;
-}
-}
-for(i=0;i<fix.smem_len;i++)
-{
-fbuffer[i]|=fbuff[i];
-}
+			   printf(" read : %d\n",count);
+			   if(count>=fix.smem_len)
+			   {
+			   read_flag = 1;
+			   }
+			   }
+			   for(i=0;i<fix.smem_len;i++)
+			   {
+			   fbuffer[i]|=fbuff[i];
+			   }
 
-}
-*/
-else if(!strcmp(buff,"Split"))
-{
-	//split mode
-	buff[0] = '\0';
-	sleep(1);
+			   }
+			   */
+			   else if(!strcmp(buff,"Split"))
+			   {
+				   //split mode
+				   buff[0] = '\0';
+				   sleep(1);
 #ifdef DEBUG
-	printf("Split mode on\n");
-	printf("is buff cleared ? : %s\n",buff);
+				   printf("Split mode on\n");
+				   printf("is buff cleared ? : %s\n",buff);
 #endif
-}
-else if(!strcmp(buff,"Exit"))
-{
-	buff[0] = '\0';
-	sleep(1);
+			   }
+			   else if(!strcmp(buff,"Exit"))
+			   {
+				   buff[0] = '\0';
+				   sleep(1);
 #ifdef DEBUG
-	printf("Exit\n");
-	printf("is buff cleared ? : %s\n",buff);
+				   printf("Exit\n");
+				   printf("is buff cleared ? : %s\n",buff);
 #endif
-	break;
-}
-else
-{
-	buff[0] = '\0';
-	sleep(1);
-	//	continue;
-	break;
-}
+				   break;
+			   }
+			   else
+			   {
+				   buff[0] = '\0';
+				   sleep(1);
+				   //	continue;
+				   break;
+			   }
 
-}
-close(clnt_sock);
-pthread_cancel(ts_thread);
-}
-pthread_join(ts_thread, NULL);
-close(serv_sock);
+		}
+		close(clnt_sock);
+		pthread_cancel(ts_thread);
+	}
+	pthread_join(ts_thread, NULL);
+	close(serv_sock);
 }
