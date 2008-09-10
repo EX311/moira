@@ -22,6 +22,7 @@
 #include <sys/ioctl.h>
 
 #include "oo.h"
+#include "read_proc.h"
 
 #include "/home/work/source/rebis-2.6/drivers/media/video/userapp.h" // linux source tree for rebis
 
@@ -32,6 +33,7 @@
 
 static camif_param_t camif_cfg;
 struct myfb_info* myfb ;
+int mylocation;
 
 char ipaddr[VFB_MAX][16];
 

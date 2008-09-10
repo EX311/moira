@@ -236,14 +236,16 @@ int main(int argc, char *argv[])
 		}
 	}
 	/* main loop */
+
 	while (quit != 0) {
 		clear_vfb_buf(VFB_MAX);
+		sleep(1);
 		buf_bmp(bh, x, y);
 		for (i=0; i<VFB_MAX; i++) {
 			if (fb_sock[i] > 0) {
 				ret = fb_send(fb_sock[i], vfb_list[i], myfb->fbfix.smem_len);
 #ifdef DEBUG
-				fprintf(stderr, "send: #%d to %s\n", ret, ipaddr[i]);
+				fprintf(stderr, "[%d] send: #%d to %s\n", i, ret, ipaddr[i]);
 #endif
 			}
 		}
