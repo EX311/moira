@@ -65,7 +65,7 @@ int main( void)
 		strncpy(send_data+1,ip_temp,15);
 		send_data[16]='e';
 
-		ran_num=((rand()%100000))+1000000;
+		ran_num=((rand()%50000))+500000;
  		
 		for(i=0;i<17;i++)
 //		printf("%c",send_data[i]);
