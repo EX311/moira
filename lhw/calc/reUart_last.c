@@ -367,7 +367,7 @@ initPoll(fd);
 */
 					if(flag==SENSER_DATA)
 					{
-//							printf("senser_data=%s\n",s_rxdata);
+							printf("senser_data=%s\n",s_rxdata);
 							
 						senser=atoi(s_rxdata);
 						set_Senser(senser);
