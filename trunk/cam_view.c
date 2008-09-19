@@ -270,6 +270,10 @@ void send_data(func)
 		{
 			fb_send(sock[i], vfb_list[i], myfb->fbfix.smem_len);
 		}
+
+#if DEBUG
+	printf(" send data  sock[%d] \n",i);
+#endif
 	}
 }
 
