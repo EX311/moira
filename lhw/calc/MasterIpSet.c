@@ -237,8 +237,15 @@ int main()
 
 //				printf("AfterMasterIp set End!!!!\n");
 			break;
-	
+
+			
 	}
+			system("cat /proc/board_status/AfterMasterIp/AfterMasterIp0");
+			system("cat /proc/board_status/AfterMasterIp/AfterMasterIp1");
+			system("cat /proc/board_status/AfterMasterIp/AfterMasterIp2");
+			system("cat /proc/board_status/AfterMasterIp/AfterMasterIp3");
+
+		
 	close(myIpfd);
 	return 1;
 
