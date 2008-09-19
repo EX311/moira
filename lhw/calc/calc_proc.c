@@ -54,8 +54,8 @@ int main(void)
 			break;
 	
 	}
-	printf("IsConnect=");
-	system("cat /proc/board_status/IsConnect");
+//	printf("IsConnect=");
+//	system("cat /proc/board_status/IsConnect");
 
 //	printf("MyLocation Set END!!\n");
 //	printf("DeviceAttached Set Start!!\n");
@@ -82,8 +82,8 @@ int main(void)
 	
 	}
 //	printf("DeviceAttached Set Start!!\n");
-	printf("DeviceAttached=");
-	system("cat /proc/board_status/DeviceAttached");
+//	printf("DeviceAttached=");
+//	system("cat /proc/board_status/DeviceAttached");
 
 	execl("/root/Master","MasterIpSet",0);
 	 

@@ -240,13 +240,10 @@ int main()
 
 			
 	}
-			printf("Master0=");
+			printf("Master= ");
 			system("cat /proc/board_status/AfterMasterIp/AfterMasterIp0");
-			printf("Master1=");
 			system("cat /proc/board_status/AfterMasterIp/AfterMasterIp1");
-			printf("Master2=");
 			system("cat /proc/board_status/AfterMasterIp/AfterMasterIp2");
-			printf("Master3=");
 			system("cat /proc/board_status/AfterMasterIp/AfterMasterIp3");
 
 		
