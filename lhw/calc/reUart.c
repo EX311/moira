@@ -284,9 +284,9 @@ int main( void)
 				//					printf("cnt=%d",cnt);
 				switch(buf[0])
 				{
-					case 's': flag=SENSER_DATA;
-						  s_rxdata[0]=buf[1];	s_rxdata[1]=buf[2];	s_rxdata[2]=buf[3];
-						  break;
+//					case 's': flag=SENSER_DATA;
+//						  s_rxdata[0]=buf[1];	s_rxdata[1]=buf[2];	s_rxdata[2]=buf[3];
+//						  break;
 					case 't':
 						  flag=RX_DATA_T;
 						  if(buf[1]=='0')	
@@ -449,13 +449,13 @@ int main( void)
 						  break;
 
 				}
-				if(flag==SENSER_DATA)
-				{
-					//							printf("senser_data=%s\n",s_rxdata);
-
-					senser=atoi(s_rxdata);
-					set_Senser(senser);
-				}
+//				if(flag==SENSER_DATA)
+//				{
+//					//							printf("senser_data=%s\n",s_rxdata);
+//
+///					senser=atoi(s_rxdata);
+//					set_Senser(senser);
+//				}
 				if( t_flag==31 || b_flag==31 || l_flag==31 || r_flag==31 )
 				{
 
