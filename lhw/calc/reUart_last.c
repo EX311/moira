@@ -138,7 +138,7 @@ initPoll(fd);
 						case 'w':	flag=DISCON_MSG_T;
 											system("echo "" > /proc/board_status/IpInfo/IpInfo0");
 											IsConnectBuf=get_IsConnect();
-											IsConnectBuf &= 16;
+											IsConnectBuf &= 14;
 											set_IsConnect(IsConnectBuf);
 											cal_process_start();
 
