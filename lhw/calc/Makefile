@@ -5,7 +5,8 @@ all:
 	@make Master
 	@make random_write
 	@make calc_proc
-	@make UI
+	@make reUart_det
+	@make reSenser
 
 Master : MasterIpSet.c read_proc_fd.c read_proc_function.c
 	$(CC) -o $@ $^
@@ -13,9 +14,11 @@ Master : MasterIpSet.c read_proc_fd.c read_proc_function.c
 reUart : reUart_last.c read_proc_fd.c read_proc_function.c
 	$(CC) -o $@ $^
 
-reUart_det : reUart_with_detect.c read_proc_fd.c read_proc_function.c
+reUart_det : reUart_det.c read_proc_fd.c read_proc_function.c
 		$(CC) -o $@ $^
 
+reSenser : reSenser.c read_proc_fd.c read_proc_function.c
+		$(CC) -o $@ $^
 
 random_write : random_write.c read_proc_fd.c read_proc_function.c
 	$(CC) -o $@ $^ 
