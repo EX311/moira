@@ -46,12 +46,12 @@ int main( void)
 			{	ipBuf[0]='0'; ipBuf[1]='0'; ipBuf[2]='0';}
 		strncpy(ip_temp,ipBuf,3);
 
-		cnt=get_IpInfo(2,ipBuf);
+		cnt=get_IpInfo(1,ipBuf);
 		if(cnt==1)
 			{	ipBuf[0]='0'; ipBuf[1]='0'; ipBuf[2]='0'; }
 		strncpy(ip_temp+3,ipBuf,3);
 
-		cnt=get_IpInfo(1,ipBuf);
+		cnt=get_IpInfo(2,ipBuf);
 		if(cnt==1)
 			{	ipBuf[0]='0'; ipBuf[1]='0'; ipBuf[2]='0'; }
 		strncpy(ip_temp+6,ipBuf,3);
