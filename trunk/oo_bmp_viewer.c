@@ -226,15 +226,17 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "%d created\n", (int)ts_thread[0]);
 #endif
 
-	ret = pthread_create(&tilt_thread, NULL, tilt_read, (void *)"tilt");
-	if (ret != 0) {
-		perror("thread create");
-		exit(1);
-	}
+	if (mode == 0) {
+		ret = pthread_create(&tilt_thread, NULL, tilt_read, (void *)"tilt");
+		if (ret != 0) {
+			perror("thread create");
+			exit(1);
+		}
 #ifdef DEBUG
-	else
-		fprintf(stderr, "%d created\n", (int)tilt_thread);
+		else
+			fprintf(stderr, "%d created\n", (int)tilt_thread);
 #endif
+	}
 
 	for (i=0; i<VFB_MAX; i++) {
 		if (ts_sock[i] > 0) {
@@ -274,9 +276,11 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	ret = pthread_cancel(tilt_thread);
-	if (ret != 0)
-		perror("thread cancel failed\n");
+	if (mode == 0) {
+		ret = pthread_cancel(tilt_thread);
+		if (ret != 0)
+			perror("thread cancel failed\n");
+	}
 	
 	for (i=0; i<VFB_MAX; i++) {
 		if (ts_sock[i] > 0) {
@@ -290,15 +294,16 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	ret = pthread_join(tilt_thread, &tilt_ret);
-	if (ret != 0)
-		fprintf(stderr, "pthread_join: Tilt\n");
+	if (mode == 0) {		
+		ret = pthread_join(tilt_thread, &tilt_ret);
+		if (ret != 0)
+			fprintf(stderr, "pthread_join: Tilt\n");
 #ifdef DEBUG
-	else
-		fprintf(stderr, "%d join ok!\n", (int)tilt_thread);
+		else
+			fprintf(stderr, "%d join ok!\n", (int)tilt_thread);
 #endif
+	}
 	
-
 	/* clean up */
 	put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, bye_msg, white);
 	clear_vfb_buf(VFB_MAX);
