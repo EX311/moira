@@ -255,16 +255,16 @@ int get_Senser(void)
 {
 	int fd;
 	int cnt;
-	char buf[3];
+	char buf[4];
 	int i;
 	int res;
 	fd=Senser_fd_return();
 	cnt = read(fd,buf,sizeof(buf));
-	#if DEBUG
-	printf("get_Senser return value = %c\n",buf);
-#endif
+	buf[cnt] = '\0';
 	res=atoi(buf);
-
+#if DEBUG
+	printf("get_Senser return value = %s / %d\n",buf, res);
+#endif
 	close(fd);
 	return res;
 
@@ -273,7 +273,7 @@ int get_Senser(void)
 int set_Senser(int senser)
 {
 	int fd;
-	char buf[3];
+	char buf[4];
 	int cnt;
 	int i;
 
