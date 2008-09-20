@@ -29,6 +29,7 @@ struct bmplist {
 int quit = 1;
 int x = 0;
 int y = 0;
+int vfb_count = 0;
 int ts_sock[VFB_MAX] = {-1,-1,-1,-1};
 struct color black = {0,0,0};
 struct color white = {0xff,0xff,0xff};
@@ -44,6 +45,7 @@ extern unsigned short *vfb_list[VFB_MAX];
 
 void *ts_net_read(void *arg);
 void *ts_local_read(void *arg);
+void *tilt_read(void *arg);
 
 static void sig(int sig)
 {
@@ -158,8 +160,8 @@ int main(int argc, char *argv[])
 	int i, ret, mode;
 	int fb_sock[VFB_MAX] = {0,};
 	bmphandle_t bh;
-	pthread_t ts_thread[VFB_MAX];
-	void *thread_ret[VFB_MAX];
+	pthread_t ts_thread[VFB_MAX], tilt_thread;
+	void *thread_ret[VFB_MAX], *tilt_ret;
 	char *invalid_msg = "Sorry, Maximum size 640x480";
 	char *bye_msg = "Bye - thank you!";
 
@@ -197,8 +199,10 @@ int main(int argc, char *argv[])
 		fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
 		if (fb_sock[i] < 0) 
 			fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
-		else
+		else {
+			vfb_count++;
 			fprintf(stderr, "[FB] %s connect success!\n", ipaddr[i]);
+		}
 
 		if (mode == 0) {
 			ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
@@ -220,6 +224,16 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
 	else
 		fprintf(stderr, "%d created\n", (int)ts_thread[0]);
+#endif
+
+	ret = pthread_create(&tilt_thread, NULL, tilt_read, (void *)"tilt");
+	if (ret != 0) {
+		perror("thread create");
+		exit(1);
+	}
+#ifdef DEBUG
+	else
+		fprintf(stderr, "%d created\n", (int)tilt_thread);
 #endif
 
 	for (i=0; i<VFB_MAX; i++) {
@@ -260,6 +274,10 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	ret = pthread_cancel(tilt_thread);
+	if (ret != 0)
+		perror("thread cancel failed\n");
+	
 	for (i=0; i<VFB_MAX; i++) {
 		if (ts_sock[i] > 0) {
 			ret = pthread_join(ts_thread[i], &thread_ret[i]);
@@ -271,6 +289,15 @@ int main(int argc, char *argv[])
 #endif
 		}
 	}
+
+	ret = pthread_join(tilt_thread, &tilt_ret);
+	if (ret != 0)
+		fprintf(stderr, "pthread_join: Tilt\n");
+#ifdef DEBUG
+	else
+		fprintf(stderr, "%d join ok!\n", (int)tilt_thread);
+#endif
+	
 
 	/* clean up */
 	put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, bye_msg, white);
@@ -398,3 +425,52 @@ void *ts_local_read(void *arg)
 	pthread_exit(0);
 }
 
+void *tilt_read(void *arg)
+{
+	int ret, value, pos = 0;
+#ifdef DEBUG
+	fprintf(stderr, "%d started... \n", *(int *)arg);
+#endif
+
+	ret = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+	if (ret != 0) {
+		perror("pthread setcancelstate");
+		exit(1);
+	}
+	ret = pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
+	if (ret != 0) {
+		perror("pthread setcanceltype");
+		exit(1);
+	}
+
+	while (1) {
+		value = get_Senser();
+		if (value < 100) {			// Left or Top
+			pos--;
+			if (pos < 0)
+				pos = vfb_count;
+		} else if (value > 120) {	// Right or Bottom
+			pos++;
+			if (pos > vfb_count)
+				pos = 0;
+		}
+
+		switch (pos) {
+			case 0:
+				x = 0; y = 0;
+				break;
+			case 1:
+				x = 320; y = 0;
+				break;
+			case 2:
+				x = 0; y = 240;
+				break;
+			case 3:
+				x = 320; y = 240;
+				break;
+		}
+	}
+
+	quit = 0;
+	pthread_exit(0);
+}
