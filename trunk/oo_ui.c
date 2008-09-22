@@ -387,6 +387,7 @@ int main(int argc, char *argv[])
 					sleep(1);
 					wait(&state);
 					no_count = 0;
+					put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, "End of Program!", white);
 #ifdef DEBUG
 					fprintf(stderr, " *** End of CHILD! ***\n");
 #endif

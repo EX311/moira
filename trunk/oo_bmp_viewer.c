@@ -21,6 +21,7 @@
 #include "oo.h"
 #include "read_proc.h"
 
+#define	DEBUG	1
 struct bmplist {
 	int x, y, w, h;
 	char name[30];
@@ -338,6 +339,8 @@ void *ts_net_read(void *arg)
 	fprintf(stderr, "%d started... \n", *(int *)arg);
 #endif
 
+	memset(tsbuff, 0, sizeof(struct ts_sample));
+
 	ret = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	if (ret != 0) {
 		perror("pthread setcancelstate");
@@ -377,7 +380,7 @@ void *ts_local_read(void *arg)
 {
 	int ret;
 	struct tsdev *ts;
-	struct ts_sample samp;
+	struct ts_sample l_samp;
 #ifdef DEBUG
 	fprintf(stderr, "%s started...\n", (char *)arg);
 #endif
@@ -395,7 +398,7 @@ void *ts_local_read(void *arg)
 
 	ts = ts_init();
 	while (quit != 0) {
-		ret = ts_read(ts, &samp, 1);
+		ret = ts_read(ts, &l_samp, 1);
 		if (ret < 0) {
 			perror("ts_read");
 			continue;
@@ -403,7 +406,7 @@ void *ts_local_read(void *arg)
 		if (ret != 1)
 			continue;
 #ifdef DEBUG
-		fprintf(stderr, "%s %ld.%06ld: %6d %6d %6d\n", (char *)arg, samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
+		fprintf(stderr, "%s %ld.%06ld: %6d %6d %6d\n", (char *)arg, l_samp.tv.tv_sec, l_samp.tv.tv_usec, l_samp.x, l_samp.y, l_samp.pressure);
 #endif
 
 		switch (mylocation) {
@@ -420,7 +423,7 @@ void *ts_local_read(void *arg)
 				x = 320; y = 240;
 				break;
 		}
-		if (samp.x > 300) {
+		if (l_samp.x > 300) {
 			break;
 		}
 	}
@@ -434,7 +437,7 @@ void *tilt_read(void *arg)
 {
 	int ret, value, pos = 0;
 #ifdef DEBUG
-	fprintf(stderr, "%d started... \n", *(int *)arg);
+	fprintf(stderr, "%s started... \n", (char *)arg);
 #endif
 
 	ret = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
