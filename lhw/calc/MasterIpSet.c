@@ -38,6 +38,10 @@ int main()
 			break;
 	
 		case 1:	//0001
+
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp1");
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp3");
+			
 //			set_MyLocation(2);
 				get_IpInfo(0,IpInfo1);
 //				printf("0 = %s\n",IpInfo1);
@@ -58,6 +62,10 @@ int main()
 	
 
 		case 2:	//0010
+
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp2");
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp3");
+			
 //			set_MyLocation(1);
 				get_IpInfo(1,IpInfo1);
 //				printf("1 = %s\n",IpInfo1);
@@ -77,6 +85,10 @@ int main()
 			break;
 		
 		case 4: //0100
+
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp1");
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp3");
+			
 //			set_MyLocation(0);
 				get_IpInfo(2,IpInfo1);
 //				printf("2 = %s\n",IpInfo1);
@@ -96,6 +108,10 @@ int main()
 			break;
 		
 		case 8: //1000
+
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp2");
+			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp3");
+			
 //			set_MyLocation(0);
 				get_IpInfo(1,IpInfo1);
 //				printf("1 = %s\n",IpInfo1);
@@ -115,6 +131,8 @@ int main()
 			break;
 		
 		case 3: //0011
+
+			
 //			set_MyLocation(3);
 				get_IpInfo(0,IpInfo1);
 				get_IpInfo(1,IpInfo2);
@@ -146,6 +164,8 @@ int main()
 			break; 
 		
 		case 6: //0110
+
+			
 //			set_MyLocation(1);
 				get_IpInfo(1,IpInfo1);
 				get_IpInfo(2,IpInfo2);
@@ -177,6 +197,8 @@ int main()
 			break;
 		
 		case 12: //1100
+
+			
 //			set_MyLocation(0);
 				get_IpInfo(2,IpInfo1);
 				get_IpInfo(3,IpInfo2);
@@ -208,6 +230,8 @@ int main()
 			break;
 		
 		case 9: //1001
+
+			
 //			set_MyLocation(2);
 				get_IpInfo(0,IpInfo1);
 				get_IpInfo(3,IpInfo2);
