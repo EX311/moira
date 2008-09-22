@@ -261,7 +261,7 @@ void cam_set(int func)
 void send_data(func)
 {
 	int i ;
-	for (i=1; i<VFB_MAX; i++) 
+	for (i=0; i<VFB_MAX; i++) 
 	{
 		
 		if(func ==2 && sock[i] > 0)
@@ -418,7 +418,7 @@ set_vfb_buf(VFB_MAX);
 				if (tmp ==0)
 					break;
 				send_data(func);
-				show_vfb(vfb_list[0]);//  demo ver need change 0 to  mylocation	
+			//	show_vfb(vfb_list[0]);//  demo ver need change 0 to  mylocation	
 			}
 			
 			else if (func == 3)
@@ -426,7 +426,7 @@ set_vfb_buf(VFB_MAX);
 				if (tmp ==0)
 					break;
 				send_data(func);
-				show_vfb(vfb_list[get_MyLocation()]);//  demo ver need change 0 to  mylocation	
+			//	show_vfb(vfb_list[get_MyLocation()]);//  demo ver need change 0 to  mylocation	
 
 			}
 
