@@ -326,7 +326,6 @@ int main(void)
 		printf("\n");
 	}
 
-char ipaddr[VFB_MAX][16];
 
 
 set_vfb_buf(VFB_MAX);
