@@ -313,7 +313,20 @@ int main(void)
 	myfb = myfb_open();
 	insert_ipaddr();
 
-	set_vfb_buf(VFB_MAX);
+	for(i =0 ; i<4 ; i++)
+	{
+		printf(" ipaddr set [%d] = ", i ); 
+		for(j=0 ; j <16 ; j++)
+		{
+			printf("%c",ipaddr[i][j]);
+		}
+		printf("\n");
+	}
+
+char ipaddr[VFB_MAX][16];
+
+
+set_vfb_buf(VFB_MAX);
 #if DEBUG
 	printf(" set_ vfb buf () \n");
 #endif
@@ -344,6 +357,8 @@ int main(void)
 	while(1)
 	{
 
+	//	insert_ipaddr();
+	
 		if (event == 9)
 		{
 			put_string_center(140, 100, " exit cam app ", white);
