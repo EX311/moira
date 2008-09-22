@@ -313,6 +313,9 @@ int main(void)
 	myfb = myfb_open();
 	insert_ipaddr();
 
+	for(i=0 ; i <10; i++)
+		printf("\n");
+
 	for(i =0 ; i<4 ; i++)
 	{
 		printf(" ipaddr set [%d] = ", i ); 
