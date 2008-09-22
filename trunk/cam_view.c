@@ -389,7 +389,7 @@ set_vfb_buf(VFB_MAX);
 		while(1)
 		{
 #if DEBUG
-			printf(" main loop start func is %d \n",func);	
+		//	printf(" main loop start func is %d \n",func);	
 #endif
 			count = read(cam_fd, (unsigned char*)cam_data, image_size);
 			if( count <0)
@@ -461,7 +461,6 @@ set_vfb_buf(VFB_MAX);
 		
 		//clear_all_screen();
 	}
-
 
 end:
 
