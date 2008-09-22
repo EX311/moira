@@ -260,7 +260,7 @@ void cam_set(int func)
 
 void send_data(func)
 {
-	int i ;
+	int i,j ;
 	for (i=0; i<VFB_MAX; i++) 
 	{
 		
@@ -274,6 +274,9 @@ void send_data(func)
 #if DEBUG
 	printf(" send data  sock[%d] \n",i);
 #endif
+
+			//for (j=0; i<myicon_count; j++) ;
+			//	draw_icon(&icon[j]);
 	}
 }
 
@@ -388,7 +391,7 @@ set_vfb_buf(VFB_MAX);
 		while(1)
 		{
 #if DEBUG
-		//	printf(" main loop start func is %d \n",func);	
+			printf(" main loop start func is %d \n",func);	
 #endif
 			count = read(cam_fd, (unsigned char*)cam_data, image_size);
 			if( count <0)
@@ -408,6 +411,10 @@ set_vfb_buf(VFB_MAX);
 					buf_pixel(j,i,tmp_color);
 				}
 			}
+			
+			for (i=0; i<myicon_count; i++)
+				draw_icon(&icon[i]);
+			
 			if(func == 1)
 			{
 				show_vfb(vfb_list[0]);//  demo ver need change 0 to  mylocation	
