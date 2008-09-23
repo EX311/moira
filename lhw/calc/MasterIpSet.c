@@ -113,7 +113,7 @@ int main()
 			system("echo "" > /proc/board_status/AfterMasterIp/AfterMasterIp3");
 			
 //			set_MyLocation(0);
-				get_IpInfo(3,IpInfo1);
+				get_IpInfo(1,IpInfo1);
 //				printf("1 = %s\n",IpInfo1);
 //				printf("My Ip is %c%c%c\n",myIp[0],myIp[1],myIp[2]);
 
