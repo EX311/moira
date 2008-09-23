@@ -260,7 +260,9 @@ void cam_set(int func)
 
 void send_data(func)
 {
-	int i,j ;
+	int i,j,k ;
+	
+
 	for (i=0; i<VFB_MAX; i++) 
 	{
 		
@@ -275,9 +277,12 @@ void send_data(func)
 	printf(" send data  sock[%d] \n",i);
 #endif
 
-			//for (j=0; i<myicon_count; j++) ;
-			//	draw_icon(&icon[j]);
+			for (j=0; j<myicon_count; j++) 
+				draw_icon(&icon[j]);
+
 	}
+
+
 }
 
 void clear_all_screen(void)
