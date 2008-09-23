@@ -194,27 +194,27 @@ int main(int argc, char *argv[])
 	for (i=0; i<VFB_MAX; i++) {
 		if (strlen(ipaddr[i]) > 14) {
 
-		if (mylocation == i)
-			continue;
+			if (mylocation == i)
+				continue;
 
-		fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
-		if (fb_sock[i] < 0) 
-			fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
-		else {
-			vfb_count++;
-			fprintf(stderr, "[FB] %s connect success!\n", ipaddr[i]);
-		}
+			fb_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 8000));
+			if (fb_sock[i] < 0) 
+				fprintf(stderr, "[FB] %s connect error\n", ipaddr[i]);
+			else {
+				vfb_count++;
+				fprintf(stderr, "[FB] %s connect success!\n", ipaddr[i]);
+			}
 
-		if (mode == 0) {
-			ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
-			if (ts_sock[i] < 0) 
-				fprintf(stderr, "[TS] %s connect error\n", ipaddr[i]);
-			else
-				fprintf(stderr, "[TS] %s connect success!\n", ipaddr[i]);
-		}
+			if (mode == 0) {
+				ts_sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i], 7000));
+				if (ts_sock[i] < 0) 
+					fprintf(stderr, "[TS] %s connect error\n", ipaddr[i]);
+				else
+					fprintf(stderr, "[TS] %s connect success!\n", ipaddr[i]);
+			}
 		}
 	}
-	
+
 	set_vfb_buf(VFB_MAX);
 
 	ret = pthread_create(&ts_thread[0], NULL, ts_local_read, (void *)"local");
@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
 		if (ret != 0)
 			perror("thread cancel failed\n");
 	}
-	
+
 	for (i=0; i<VFB_MAX; i++) {
 		if (ts_sock[i] > 0) {
 			ret = pthread_join(ts_thread[i], &thread_ret[i]);
@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "%d join ok!\n", (int)tilt_thread);
 #endif
 	}
-	
+
 	/* clean up */
 	put_string_center(myfb->fbvar.xres/2, myfb->fbvar.yres/2, bye_msg, white);
 	clear_vfb_buf(VFB_MAX);
