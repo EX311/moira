@@ -14,6 +14,9 @@ Master : MasterIpSet.c read_proc_fd.c read_proc_function.c
 reUart : reUart_last.c read_proc_fd.c read_proc_function.c
 	$(CC) -o $@ $^
 
+reUart_fin : reUart_fin.c read_proc_fd.c read_proc_function.c
+	$(CC) -o $@ $^
+
 reUart_det : reUart_det.c read_proc_fd.c read_proc_function.c
 		$(CC) -o $@ $^
 
