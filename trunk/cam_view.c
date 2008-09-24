@@ -265,7 +265,8 @@ void send_data(func)
 
 	for (i=0; i<VFB_MAX; i++) 
 	{
-		
+		if(i == get_MyLocation())
+		 	continue;
 		if(func ==2 && sock[i] > 0)
 			fb_send(sock[i], vfb_list[0], myfb->fbfix.smem_len);
 		else if (func ==3 && sock[i]>0)
@@ -382,7 +383,9 @@ set_vfb_buf(VFB_MAX);
 		{
 			for(i =0 ; i <VFB_MAX ; i++)
 			{
-			if (strlen(ipaddr[i]) > 13) {
+				if(i == get_MyLocation())
+				 	continue;
+				if (strlen(ipaddr[i]) > 13) {
 				sock[i] = tcp_client_connect(ipaddr[i], ip2port(ipaddr[i],8000));
 				if (sock[i] < 0)
 				{
@@ -429,7 +432,7 @@ set_vfb_buf(VFB_MAX);
 				if (tmp ==0)
 					break;
 				send_data(func);
-			//	show_vfb(vfb_list[0]);//  demo ver need change 0 to  mylocation	
+				show_vfb(vfb_list[0]);//  demo ver need change 0 to  mylocation	
 			}
 			
 			else if (func == 3)
@@ -437,7 +440,7 @@ set_vfb_buf(VFB_MAX);
 				if (tmp ==0)
 					break;
 				send_data(func);
-			//	show_vfb(vfb_list[get_MyLocation()]);//  demo ver need change 0 to  mylocation	
+				show_vfb(vfb_list[get_MyLocation()]);//  demo ver need change 0 to  mylocation	
 
 			}
 
